@@ -2,7 +2,7 @@
   "name": "tracker",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://hexmayank.github.io/tracker/",
+  "homepage": "https://mayankhex.github.io/tracker/",
   "dependencies": {
     "firebase": "^10.7.0",
     "react": "^18.2.0",
