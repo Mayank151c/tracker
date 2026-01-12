@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useConfig } from '../App';
 import AddTasks from '../components/AddTasks';
 import TaskList from '../components/TaskList';
 import DatePicker from '../components/DatePicker';

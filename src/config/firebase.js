@@ -1,10 +1,7 @@
-// Firebase Configuration
-// Reads from .env file automatically
-
 import { initializeApp } from 'firebase/app';
 import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import CryptoJS from 'crypto-js';
-import { REACT_APP_ENV, DEBUG } from './constants';
+import { DEBUG } from './constants';
 
 const encryptedConfig = {
   apiKey: 'U2FsdGVkX197kPyyOC87+9/XblYmm6TSdYrzUxkHqf3M6Hq71laAeeS/ihqur6sEef1v0FVeO16HYshFcC0sfw==',

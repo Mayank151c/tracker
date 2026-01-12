@@ -1,5 +1,5 @@
 import { collection, addDoc, getDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { initFirebase } from '../config/firebase';
 import { DEBUG } from '../config/constants';
@@ -25,8 +25,8 @@ export default function HealthCheck() {
 
   const addTestResult = (id, test, status, message) => {
     setTestResults((prev) => {
-      const index = prev.findIndex((result) => result?.id == id);
-      if (index != -1) {
+      const index = prev.findIndex((result) => result?.id === id);
+      if (index !== -1) {
         prev[index] = { id, test, status, message, timestamp: new Date() };
         return prev;
       } else {
@@ -34,57 +34,55 @@ export default function HealthCheck() {
       }
     });
   };
-
-  const runConnectionTest = async (db) => {
-    // Test 1: Write to Firestore (quick test)
-    addTestResult(healthCheckType.WRITE, 'Write Test', 'testing', 'Writing test document...');
-    const testCollection = collection(db, 'healthCheck');
-    const testDoc = await Promise.race([
-      addDoc(testCollection, {
-        timestamp: Timestamp.now(),
-        test: 'health-check',
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Write operation timed out')), 10000)),
-    ]);
-    addTestResult(healthCheckType.WRITE, 'Write Test', 'success', 'Write successful', true);
-
-    // Test 2: Read from Firestore (quick test using getDoc)
-    const testDocRef = doc(db, 'healthCheck', testDoc.id);
-    addTestResult(healthCheckType.READ, 'Read Test', 'testing', 'Reading test document...', true);
-    const docSnapshot = await Promise.race([
-      getDoc(testDocRef),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Read operation timed out')), 10000)),
-    ]);
-    if (docSnapshot.exists()) {
-      addTestResult(healthCheckType.READ, 'Read Test', 'success', 'Read successful', true);
-    } else {
-      addTestResult(healthCheckType.READ, 'Read Test', 'error', 'Document not found', false);
-      throw new Error('Unable to read document');
-    }
-
-    // Cleanup
-    addTestResult(healthCheckType.DELETE, 'Delete Test', 'testing', 'Deleting test document...', true);
-    await Promise.race([
-      deleteDoc(testDocRef).catch(() => {
-        addTestResult(healthCheckType.DELETE, 'Delete Test', 'error', 'Delete failed', false);
-      }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Delete operation timed out')), 10000)),
-    ]);
-    addTestResult(healthCheckType.DELETE, 'Delete Test', 'success', 'Deleted successful', true);
-
-    return true;
-  };
-
-  const runConfigValidation = async (secret) => {
-    setTesting(true);
+	
+  const runConfigValidation = useCallback(async (secret) => {
+		setTesting(true);
     setTestResults([]);
     setError(null);
+
+		const runConnectionTest = async (db) => {
+			addTestResult(healthCheckType.WRITE, 'Write Test', 'testing', 'Writing test document...');
+			const testCollection = collection(db, 'healthCheck');
+			const testDoc = await Promise.race([
+				addDoc(testCollection, {
+					timestamp: Timestamp.now(),
+					test: 'health-check',
+				}),
+				new Promise((_, reject) => setTimeout(() => reject(new Error('Write operation timed out')), 10000)),
+			]);
+			addTestResult(healthCheckType.WRITE, 'Write Test', 'success', 'Write successful', true);
+	
+			const testDocRef = doc(db, 'healthCheck', testDoc.id);
+			addTestResult(healthCheckType.READ, 'Read Test', 'testing', 'Reading test document...', true);
+			const docSnapshot = await Promise.race([
+				getDoc(testDocRef),
+				new Promise((_, reject) => setTimeout(() => reject(new Error('Read operation timed out')), 10000)),
+			]);
+			if (docSnapshot.exists()) {
+				addTestResult(healthCheckType.READ, 'Read Test', 'success', 'Read successful', true);
+			} else {
+				addTestResult(healthCheckType.READ, 'Read Test', 'error', 'Document not found', false);
+				throw new Error('Unable to read document');
+			}
+	
+			// Cleanup
+			addTestResult(healthCheckType.DELETE, 'Delete Test', 'testing', 'Deleting test document...', true);
+			await Promise.race([
+				deleteDoc(testDocRef).catch(() => {
+					addTestResult(healthCheckType.DELETE, 'Delete Test', 'error', 'Delete failed', false);
+				}),
+				new Promise((_, reject) => setTimeout(() => reject(new Error('Delete operation timed out')), 10000)),
+			]);
+			addTestResult(healthCheckType.DELETE, 'Delete Test', 'success', 'Deleted successful', true);
+	
+			return true;
+		};
 
     try {
       // Initialize Firebase (with timeout)
       addTestResult(healthCheckType.CONFIG, 'Verifying Firebase Config', 'testing', 'Connecting to Firebase...');
       const initPromise = initFirebase(secret);
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase initialization timed out')), 15000));
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase initialization timed out')), 10000));
       const { db } = await Promise.race([initPromise, timeoutPromise]);
       addTestResult(healthCheckType.CONFIG, 'Verified Firebase Config', 'success', 'Firebase connected', true);
 
@@ -119,7 +117,7 @@ export default function HealthCheck() {
     } finally {
       setTesting(false);
     }
-  };
+  }, [setDb, updatePath]);
 
   const handleSecretSubmit = (e) => {
     e.preventDefault();
@@ -137,7 +135,7 @@ export default function HealthCheck() {
     if (secret) {
       runConfigValidation(secret);
     }
-  }, []);
+  }, [runConfigValidation]);
 
   return (
     <div className="container">

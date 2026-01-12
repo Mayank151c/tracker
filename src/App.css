@@ -18,6 +18,17 @@ h1 {
   font-family: 'sans-serif';
 }
 
+#nav {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+	button {
+		flex-grow: 1;
+		padding: 10px;
+		border-radius: 8px;
+	}
+}
+
 h2 {
   color: #fffd;
   margin-bottom: 1rem;

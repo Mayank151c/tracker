@@ -25,7 +25,6 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
     setAddingTask(true);
 
     try {
-      const addTaskDocs = [];
       const bulkId = Date.now();
       const tasksCollection = collection(db, 'env', REACT_APP_ENV, 'tasks');
       await executeCallbackForDateRange(startDate, endDate, async (date) => {

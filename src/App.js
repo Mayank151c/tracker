@@ -50,6 +50,10 @@ export default function App() {
 
       {/* Page Content */}
       <div className="container">
+				<div id='nav'>
+					<button>{'Nav1'}</button>
+					<button>{'Nav2'}</button>
+				</div>
         <h1>{PAGES[page]?.title || 'Title Not Found'}</h1>
         {((path) => {
           switch (path) {

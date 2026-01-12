@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { REACT_APP_ENV } from '../config/constants';
 import { getTodayDateString } from '../utils';
@@ -33,7 +33,7 @@ export default function DailySummary({ selectedDate }) {
   };
 
   // Load summary for selected date
-  const loadSummary = async () => {
+  const loadSummary = useCallback(async () => {
     if (!db) {
       setError('Firebase not initialized. Please configure first.');
       return;
@@ -58,7 +58,7 @@ export default function DailySummary({ selectedDate }) {
         stack: err.stack,
       });
     }
-  };
+  }, [db, selectedDate, setError]);
 
   const handleSummaryUpdate = (e) => {
     setDailySummary(e.target.value);
@@ -66,8 +66,8 @@ export default function DailySummary({ selectedDate }) {
   };
 
   useEffect(() => {
-    loadSummary();
-  }, [selectedDate]);
+		loadSummary();
+	}, [selectedDate, loadSummary]);
 
   return (
     <>
