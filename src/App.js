@@ -24,6 +24,7 @@ export default function App() {
 
   // updates URL without re-render
   const updatePath = (newPath) => {
+		newPath = 'tracker' + newPath;
     setPage(newPath);
     window.history.pushState({ path: newPath }, '', newPath);
   };
