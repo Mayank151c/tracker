@@ -50,10 +50,10 @@ export default function App() {
 
       {/* Page Content */}
       <div className="container">
-				<div id='nav'>
-					<button>{'Nav1'}</button>
-					<button>{'Nav2'}</button>
-				</div>
+				<nav id='nav'>
+					<button onClick={()=> updatePath('/daily-task')}>DailyTaskPage</button>
+					<button onClick={()=> updatePath('/bulk-task')}>Bulk Task</button>
+				</nav>
         <h1>{PAGES[page]?.title || 'Title Not Found'}</h1>
         {((path) => {
           switch (path) {
