@@ -15,5 +15,5 @@ export default function TaskSection({ startDate, endDate }) {
 
       {tasks.length === 0 && <div id="empty-list">No tasks for this day. Add one above!</div>}
     </div>
-  );  
+  );
 }

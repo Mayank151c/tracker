@@ -19,14 +19,14 @@ h1 {
 }
 
 #nav {
-	display: flex;
-	align-items: center;
-	margin-bottom: 20px;
-	button {
-		flex-grow: 1;
-		padding: 10px;
-		border-radius: 8px;
-	}
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  button {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px;
+  }
 }
 
 h2 {

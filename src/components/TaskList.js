@@ -4,24 +4,25 @@ import { REACT_APP_ENV } from '../config/constants';
 import { useConfig } from '../App';
 
 export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) {
-  const { db, setError } = useConfig();
+  const { db, setError, navigate } = useConfig();
   const [loading, setLoading] = useState(false);
-	const [deleteIcon, setDeleteIcon] = useState(null);
+  const [deleteIcon, setDeleteIcon] = useState(null);
 
-	useEffect(()=>{
-		async function fetchImage() {
-				fetch("https://img.icons8.com/glyph-neue/512/delete--v1.png")
-					.then(response => response.blob())
-					.then(blob => setDeleteIcon(URL.createObjectURL(blob)))
-					.catch(e => console.error('Error fetching image', e))
-		} fetchImage();
-	}, [])
-	console.log(deleteIcon);
+  useEffect(() => {
+    async function fetchImage() {
+      fetch('https://img.icons8.com/glyph-neue/512/delete--v1.png')
+        .then((response) => response.blob())
+        .then((blob) => setDeleteIcon(URL.createObjectURL(blob)))
+        .catch((e) => console.error('Error fetching image', e));
+    }
+    fetchImage();
+  }, []);
+
   // Load tasks for selected date
   const loadTasks = useCallback(async () => {
     if (!db) {
       setError('Firebase not initialized. Please configure first.');
-      return;
+      return navigate('');
     }
 
     setLoading(true);
@@ -115,8 +116,8 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
 
   // Reload data when date changes or when db becomes available
   useEffect(() => {
-    db && loadTasks();
-  }, [startDate, endDate, db, loadTasks]);
+    loadTasks();
+  }, [startDate, endDate, loadTasks]);
 
   return (
     <div className="tasks-list">
@@ -153,7 +154,7 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
           {/* Delete button */}
           {!task.completed && (
             <button onClick={() => deleteTask(task.id)} id="btn-delete" disabled={loading}>
-							<img src={deleteIcon} alt="delete--v1" width={20} height={24.5} />
+              <img src={deleteIcon} alt="delete--v1" width={20} height={24.5} />
             </button>
           )}
         </div>

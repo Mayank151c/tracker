@@ -20,13 +20,12 @@ export const useConfig = () => {
 export default function App() {
   const [db, setDb] = useState(null);
   const [error, setError] = useState(null);
-  const [page, setPage] = useState('/');
+  const [page, setPage] = useState(window.location.hash.slice(1));
 
   // updates URL without re-render
-  const updatePath = (newPath) => {
-		newPath = 'tracker' + newPath;
+  const navigate = (newPath) => {
     setPage(newPath);
-    window.history.pushState({ path: newPath }, '', newPath);
+    window.history.pushState({}, '', `#${newPath}`);
   };
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export default function App() {
   return (
     <AppContext.Provider
       value={{
-        updatePath,
+        navigate,
         db,
         setDb,
         error,
@@ -51,16 +50,16 @@ export default function App() {
 
       {/* Page Content */}
       <div className="container">
-				<nav id='nav'>
-					<button onClick={()=> updatePath('/daily-task')}>DailyTaskPage</button>
-					<button onClick={()=> updatePath('/bulk-task')}>Bulk Task</button>
-				</nav>
+        <nav id="nav">
+          <button onClick={() => navigate('daily-task')}>DailyTaskPage</button>
+          <button onClick={() => navigate('bulk-task')}>Bulk Task</button>
+        </nav>
         <h1>{PAGES[page]?.title || 'Title Not Found'}</h1>
         {((path) => {
           switch (path) {
-            case '/daily-task':
+            case 'daily-task':
               return <DailyTaskPage />;
-            case '/bulk-task':
+            case 'bulk-task':
               return <AddBulkTasks />;
             default:
               return <HealthCheck />;

@@ -6,7 +6,7 @@ import { getTodayDateString } from '../utils';
 import { useConfig } from '../App';
 
 export default function DailySummary({ selectedDate }) {
-  const { db, setError } = useConfig();
+  const { db, setError, navigate } = useConfig();
 
   const [enable, setEnable] = useState(false);
   const [dailySummary, setDailySummary] = useState('');
@@ -36,7 +36,7 @@ export default function DailySummary({ selectedDate }) {
   const loadSummary = useCallback(async () => {
     if (!db) {
       setError('Firebase not initialized. Please configure first.');
-      return;
+      return navigate('');
     }
 
     setError(null);
@@ -66,8 +66,8 @@ export default function DailySummary({ selectedDate }) {
   };
 
   useEffect(() => {
-		loadSummary();
-	}, [selectedDate, loadSummary]);
+    loadSummary();
+  }, [selectedDate, loadSummary]);
 
   return (
     <>
