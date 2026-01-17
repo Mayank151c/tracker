@@ -18,10 +18,19 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Install dependencies
+      - name: Adding Secrets
         env:
           REACT_APP_ENV: prod
           REACT_APP_FIREBASE_CONFIG: ${{ secrets.REACT_APP_FIREBASE_CONFIG }}
+        run: |
+          if [ -z "$REACT_APP_FIREBASE_CONFIG" ]; then
+            echo "::error::Secret 'Firebase Config' is missing or empty!"
+            exit 1
+          else
+            echo "Secrets are found!"
+          fi
+
+      - name: Install dependencies
         run: npm install
 
       - name: Build the React app
