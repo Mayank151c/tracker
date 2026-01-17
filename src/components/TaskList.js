@@ -49,7 +49,7 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
     } finally {
       setLoading(false);
     }
-  }, [db, endDate, setError, setTasks, startDate]);
+  }, [db, endDate, setError, setTasks, navigate, startDate]);
 
   // Delete a task
   const deleteTask = async (id) => {

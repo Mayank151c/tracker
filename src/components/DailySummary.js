@@ -58,7 +58,7 @@ export default function DailySummary({ selectedDate }) {
         stack: err.stack,
       });
     }
-  }, [db, selectedDate, setError]);
+  }, [db, selectedDate, navigate, setError]);
 
   const handleSummaryUpdate = (e) => {
     setDailySummary(e.target.value);
