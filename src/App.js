@@ -43,7 +43,7 @@ export default function App() {
       }}
     >
       {/* Env Display */}
-      {<div style={{ position: 'fixed' }}>{REACT_APP_ENV}</div>}
+      {REACT_APP_ENV !== 'prod' && <div style={{ position: 'fixed' }}>{REACT_APP_ENV}</div>}
 
       {/* Error Display */}
       {error && <FloatingError />}
