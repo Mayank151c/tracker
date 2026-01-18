@@ -20,7 +20,6 @@ on:
         description: 'Firebase Config'
         required: false
         type: string
-        default: ${{ secrets.REACT_APP_FIREBASE_CONFIG }}
 
 # environment variables on top level, available to all jobs
 env:
@@ -35,9 +34,16 @@ permissions:
 jobs:
   build-and-deploy:
     # slim image boot a bit faster (not for heavy builds, docker not supported)
-    runs-on: ubuntu-slim 
+    runs-on: ubuntu-slim
 
     steps:
+      - name: Check Secrets
+        run: |
+          if [ -z "$REACT_APP_FIREBASE_CONFIG" ]; then
+            echo "Failed to load Secrets"
+            exit 1
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v6
 
@@ -45,7 +51,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          # this will cache the node_modules folder 
+          # this will cache the node_modules folder
           # cache: 'npm'
           # cache-dependency-path: '**/package.json'
 
@@ -62,14 +68,8 @@ jobs:
         if: steps.cache-npm.outputs.cache-hit != 'true'
         run: npm ci --loglevel error
 
-      - name: Check Secrets & Build the App
-        run: |
-          if [ -z "$REACT_APP_FIREBASE_CONFIG" ]; then
-            echo "Failed to load Secrets"
-            exit 1
-          else
-            npm run build
-          fi
+      - name: Build the App
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
