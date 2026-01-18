@@ -10,7 +10,7 @@ on:
 
 #permissions
 permissions:
-  contents: read
+  contents: write
 
 #start list of jobs in pipeline
 jobs:
