@@ -1,10 +1,13 @@
+#name of workflow
 name: Deploy Tracker App
 
+#when the workflow will be triggered
 on:
   push:
     branches:
       - main
 
+#start list of jobs in pipeline
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -17,9 +20,14 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
 
+      #install dependencies
+      #'npm ci' works the same as 'npm install' but is preferred command for CI/CD
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm ci
 
       - name: Check Secrets and Build the App
         env:
