@@ -6,6 +6,11 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+#permissions
+permissions:
+  contents: read
 
 #start list of jobs in pipeline
 jobs:
