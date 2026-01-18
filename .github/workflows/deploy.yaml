@@ -1,21 +1,41 @@
-#name of workflow
+# name of workflow
 name: Deploy Tracker App
 
-#when the workflow will be triggered
+# when the workflow will be triggered
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        default: 'dev'
+        options:
+          - dev
+          - prod
+      config:
+        description: 'Firebase Config'
+        required: false
+        type: string
+        default: ${{ secrets.REACT_APP_FIREBASE_CONFIG }}
 
-#permissions
+# environment variables on top level, available to all jobs
+env:
+  REACT_APP_ENV: ${{ github.event.inputs.environment || 'prod' }}
+  REACT_APP_FIREBASE_CONFIG: ${{  github.event.inputs.config || secrets.REACT_APP_FIREBASE_CONFIG }}
+
+# permissions
 permissions:
   contents: write
 
-#start list of jobs in pipeline
+# list of jobs in pipeline
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    # slim image boot a bit faster (not for heavy builds, docker not supported)
+    runs-on: ubuntu-slim 
 
     steps:
       - name: Checkout code
@@ -25,25 +45,29 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: '**/package.json'
+          # this will cache the node_modules folder 
+          # cache: 'npm'
+          # cache-dependency-path: '**/package.json'
 
-      #install dependencies
-      #'npm ci' works the same as 'npm install' but is preferred command for CI/CD
+      - name: Cache node_modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ env.REACT_APP_ENV }}-build-${{ hashFiles('**/package-lock.json') }}
+
+      # Install dependencies if not updated
+      # 'npm ci' is same as 'npm install' but preferred command for CI/CD
       - name: Install dependencies
-        run: |
-          npm ci
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        run: npm ci --loglevel error
 
-      - name: Check Secrets and Build the App
-        env:
-          REACT_APP_ENV: prod
-          REACT_APP_FIREBASE_CONFIG: ${{ secrets.REACT_APP_FIREBASE_CONFIG }}
+      - name: Check Secrets & Build the App
         run: |
           if [ -z "$REACT_APP_FIREBASE_CONFIG" ]; then
-            echo "::error::Secret 'Firebase Config' is missing or empty!"
+            echo "Failed to load Secrets"
             exit 1
           else
-            echo "Secrets found! Building the app..."
             npm run build
           fi
 
