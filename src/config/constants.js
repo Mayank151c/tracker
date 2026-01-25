@@ -6,11 +6,11 @@ export const PAGES = {
     path: 'health-check',
   },
   'daily-task': {
-    title: 'Daily Task Tracker',
+    title: 'Daily Task',
     path: 'daily-task',
   },
   'bulk-task': {
-    title: 'Bulk Task Tracker',
+    title: 'Bulk Task',
     path: 'bulk-task',
   },
 };

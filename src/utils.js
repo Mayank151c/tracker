@@ -4,14 +4,18 @@ export const getTodayDateString = function (date = new Date(), isIST = false) {
   return date.toISOString().split('T')[0];
 };
 
-export const executeCallbackForDateRange = async (start, end, callback) => {
+async function executeCallbackForRange(start, end, callback, range) {
   let currentDate = new Date(start);
   const endDate = new Date(end);
 
   const callbacks = [];
   while (currentDate <= endDate) {
     callbacks.push(callback(getTodayDateString(currentDate, true)));
-    currentDate.setDate(currentDate.getDate() + 1);
+    currentDate.setDate(currentDate.getDate() + range);
   }
   await Promise.all(callbacks);
+}
+
+export const executeCallbackForDateRange = async (start, end, callback) => {
+  return await executeCallbackForRange(start, end, callback, 1);
 };
