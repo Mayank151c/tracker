@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { REACT_APP_ENV } from '../config/constants';
-import { useConfig } from '../App';
+import { useConfig } from '../utils';
 import './TaskList.css';
 
 export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) {

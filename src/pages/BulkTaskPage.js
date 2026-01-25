@@ -3,7 +3,7 @@ import AddTasks from '../components/AddTasks';
 import TaskList from '../components/TaskList';
 import DatePicker from '../components/DatePicker';
 import { getTodayDateString } from '../utils';
-import DateSection from '../components/DateSection';
+import Section from '../components/Section';
 
 export default function BulkTask() {
   const [tasks, setTasks] = useState([]);
@@ -13,7 +13,7 @@ export default function BulkTask() {
   return (
     <div className="tasks-section">
       <h2>Bulk Tasks</h2>
-      <DateSection>
+      <Section>
         <DatePicker label="Start Date" date={startDate} setDate={setStartDate} max={endDate} />
         <DatePicker
           label="End Date"
@@ -22,7 +22,7 @@ export default function BulkTask() {
           min={startDate}
           max={getTodayDateString(new Date(new Date().setFullYear(new Date().getFullYear() + 1)))}
         />
-      </DateSection>
+      </Section>
       <AddTasks tasks={tasks} setTasks={setTasks} startDate={startDate} endDate={endDate} />
 
       <TaskList bulk={true} startDate={startDate} endDate={endDate} tasks={tasks} setTasks={setTasks} />

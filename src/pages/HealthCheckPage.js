@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { initFirebase } from '../config/firebase';
 import { DEBUG } from '../config/constants';
-import { useConfig } from '../App';
+import { useConfig } from '../utils';
 import './HealthCheckPage.css';
 
 const healthCheckType = {

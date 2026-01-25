@@ -1,21 +1,14 @@
-import { useState, createContext, useContext } from 'react';
+import { useState, createContext } from 'react';
 import './App.css';
 
 import HealthCheck from './pages/HealthCheckPage';
 import DailyTaskPage from './pages/DailyTaskPage';
 import AddBulkTasks from './pages/BulkTaskPage';
 import FloatingError from './components/FloatingError';
+import Navigation from './components/Navigation';
 import { REACT_APP_ENV, PAGES } from './config/constants';
 
 export const AppContext = createContext(null);
-
-export const useConfig = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useConfig must be used within a AppProvider');
-  }
-  return context;
-};
 
 export default function App() {
   const [db, setDb] = useState(null);
@@ -46,16 +39,7 @@ export default function App() {
 
       {/* Page Content */}
       <div className="container">
-        <nav id="nav">
-          {Object.entries(PAGES).map(
-            ([key, { path, title }]) =>
-              key && (
-                <button key={path} onClick={() => navigate(path)}>
-                  {title}
-                </button>
-              ),
-          )}
-        </nav>
+        <Navigation />
         <h1>{PAGES[page]?.title || 'Title Not Found'}</h1>
         {((path) => {
           switch (path) {

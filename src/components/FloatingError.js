@@ -1,4 +1,4 @@
-import { useConfig } from '../App';
+import { useConfig } from '../utils';
 import './FloatingError.css';
 
 export default function FloatingError() {

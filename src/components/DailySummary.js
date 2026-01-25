@@ -1,9 +1,9 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 
+import Section from './Section';
 import { REACT_APP_ENV } from '../config/constants';
-import { getTodayDateString } from '../utils';
-import { useConfig } from '../App';
+import { getTodayDateString, useConfig } from '../utils';
 
 export default function DailySummary({ selectedDate }) {
   const { db, setError, navigate } = useConfig();
@@ -72,7 +72,7 @@ export default function DailySummary({ selectedDate }) {
   return (
     <>
       <h2>Daily Summary</h2>
-      <div className="summary-section">
+      <Section>
         <textarea
           value={dailySummary}
           onChange={handleSummaryUpdate}
@@ -83,7 +83,7 @@ export default function DailySummary({ selectedDate }) {
         <button onClick={saveSummary} className="btn btn-primary" disabled={!enable}>
           Save Summary
         </button>
-      </div>
+      </Section>
     </>
   );
 }

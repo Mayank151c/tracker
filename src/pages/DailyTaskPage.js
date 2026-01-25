@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import DailySummary from '../components/DailySummary';
-import DateSection from '../components/DateSection';
+import Section from '../components/Section';
 import TaskSection from '../components/TaskSection';
 import DatePicker from '../components/DatePicker';
 import { getTodayDateString } from '../utils';
@@ -11,9 +11,9 @@ export default function DailyTaskPage() {
 
   return (
     <div>
-      <DateSection>
+      <Section horizontal={true}>
         <DatePicker label="Select Date:" date={selectedDate} setDate={setSelectedDate} />
-      </DateSection>
+      </Section>
 
       <TaskSection startDate={selectedDate} endDate={selectedDate} />
       <DailySummary selectedDate={selectedDate} />

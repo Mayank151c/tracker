@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { REACT_APP_ENV } from '../config/constants';
-import { useConfig } from '../App';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
-import { executeCallbackForDateRange } from '../utils';
+import { executeCallbackForDateRange, useConfig } from '../utils';
 
 export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
   const { db, setError } = useConfig();

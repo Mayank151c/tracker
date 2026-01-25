@@ -1,0 +1,16 @@
+.vertical-section {
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
+
+.horizontal-section {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px;
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+}
