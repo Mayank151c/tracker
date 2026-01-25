@@ -10,7 +10,6 @@ export default function DatePicker({ label, date, setDate, max, min }) {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        onSelectCapture={() => console.log('up')}
         max={max || getTodayDateString()}
         min={min || getTodayDateString(new Date('2026'))}
       />

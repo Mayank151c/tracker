@@ -25,14 +25,14 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
     setAddingTask(true);
 
     try {
-      const bulkId = Date.now();
+      const bulkId = taskText.toLowerCase().replace(/\W/g, '-');
       const tasksCollection = collection(db, 'env', REACT_APP_ENV, 'tasks');
       await executeCallbackForDateRange(startDate, endDate, async (date) => {
         const newTask = {
           text: taskText,
           date: date,
           completed: false,
-          bulkId: `bulkId-${bulkId}`,
+          bulkId: bulkId,
           createdAt: Timestamp.now(),
         };
         await addDoc(tasksCollection, newTask)

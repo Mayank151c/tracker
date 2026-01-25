@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useEffect } from 'react';
+import { useState, createContext, useContext } from 'react';
 import './App.css';
 
 import HealthCheck from './pages/HealthCheckPage';
@@ -28,10 +28,6 @@ export default function App() {
     window.history.pushState({}, '', `#${newPath}`);
   };
 
-  useEffect(() => {
-    console.log(page);
-  }, [page]);
-
   return (
     <AppContext.Provider
       value={{
@@ -51,8 +47,14 @@ export default function App() {
       {/* Page Content */}
       <div className="container">
         <nav id="nav">
-          <button onClick={() => navigate('daily-task')}>DailyTaskPage</button>
-          <button onClick={() => navigate('bulk-task')}>Bulk Task</button>
+          {Object.entries(PAGES).map(
+            ([key, { path, title }]) =>
+              key && (
+                <button key={path} onClick={() => navigate(path)}>
+                  {title}
+                </button>
+              ),
+          )}
         </nav>
         <h1>{PAGES[page]?.title || 'Title Not Found'}</h1>
         {((path) => {
