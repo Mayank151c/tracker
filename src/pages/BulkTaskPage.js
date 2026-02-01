@@ -12,8 +12,7 @@ export default function BulkTask() {
 
   return (
     <div className="tasks-section">
-      <h2>Bulk Tasks</h2>
-      <Section>
+      <Section horizontal={true}>
         <DatePicker label="Start Date" date={startDate} setDate={setStartDate} max={endDate} />
         <DatePicker
           label="End Date"

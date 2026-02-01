@@ -7,6 +7,12 @@ export const getTodayDateString = function (date = new Date(), isIST = false) {
   return date.toISOString().split('T')[0];
 };
 
+// Get today's date in YYYY-MM-DD HH:MM:SS format
+export const getTodayDatetimeString = function (date = new Date(), isIST = false) {
+  if (!isIST) date.setMinutes(date.getMinutes() + 330);
+  return date.toISOString().replace(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}).*$/, '$1 $2 IST');
+};
+
 export const useConfig = () => {
   const context = useContext(AppContext);
   if (!context) {

@@ -13,9 +13,12 @@ body {
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #123456 0%, #987654 100%);
-  /* background: linear-gradient(135deg, #003a1d 0%, #987654 100%); */
   min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  justify-content: center;
 }
 
 code {

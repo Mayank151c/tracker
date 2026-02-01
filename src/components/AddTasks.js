@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { REACT_APP_ENV } from '../config/constants';
+import { REACT_APP_ENV, ERRORS } from '../config/constants';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { executeCallbackForDateRange, useConfig } from '../utils';
 
@@ -14,7 +14,7 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
     if (!taskInput.trim() || addingTask) return;
 
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return;
     }
 

@@ -2,7 +2,7 @@ import { collection, addDoc, getDoc, deleteDoc, doc, Timestamp } from 'firebase/
 import { useEffect, useState, useRef, useCallback } from 'react';
 
 import { initFirebase } from '../config/firebase';
-import { DEBUG } from '../config/constants';
+import { IS_DEV } from '../config/constants';
 import { useConfig } from '../utils';
 import './HealthCheckPage.css';
 
@@ -94,7 +94,7 @@ export default function HealthCheck() {
       } catch (err) {
         // Cleanup session
         sessionStorage.removeItem('scrt');
-        if (DEBUG) console.error('Configuration check failed:', err);
+        if (IS_DEV) console.error('Configuration check failed:', err);
 
         let errorMessage = 'Error: ';
 

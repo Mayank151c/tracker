@@ -2,8 +2,8 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 
 import Section from './Section';
-import { REACT_APP_ENV } from '../config/constants';
-import { getTodayDateString, useConfig } from '../utils';
+import { REACT_APP_ENV, ERRORS, COLLECTIONS } from '../config/constants';
+import { getTodayDatetimeString, useConfig } from '../utils';
 
 export default function DailySummary({ selectedDate }) {
   const { db, setError, navigate } = useConfig();
@@ -15,13 +15,13 @@ export default function DailySummary({ selectedDate }) {
   const saveSummary = async () => {
     setError(null);
     try {
-      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, 'dailySummaries', selectedDate);
+      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, COLLECTIONS.DAILY_SUMMARIES, selectedDate);
       await setDoc(
         summaryDocRef,
         {
           date: selectedDate,
           summary: dailySummary.trim(),
-          updatedAt: getTodayDateString(),
+          updatedAt: getTodayDatetimeString(),
         },
         { merge: true },
       );
@@ -35,7 +35,7 @@ export default function DailySummary({ selectedDate }) {
   // Load summary for selected date
   const loadSummary = useCallback(async () => {
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return navigate('');
     }
 
@@ -43,7 +43,7 @@ export default function DailySummary({ selectedDate }) {
 
     try {
       // Load summary for selected date
-      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, 'dailySummaries', selectedDate);
+      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, COLLECTIONS.DAILY_SUMMARIES, selectedDate);
       const summaryDoc = await getDoc(summaryDocRef);
       if (summaryDoc.exists()) {
         setDailySummary(summaryDoc.data().summary || '');
@@ -57,6 +57,7 @@ export default function DailySummary({ selectedDate }) {
         message: err.message,
         stack: err.stack,
       });
+      setError(err.message);
     }
   }, [db, selectedDate, navigate, setError]);
 
