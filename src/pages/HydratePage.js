@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { getTodayDateString, getTodayDatetimeString, useConfig } from '../utils';
-import { REACT_APP_ENV, ERRORS, COLLECTIONS } from '../config/constants';
+import { getRecord, setRecord, useConfig } from '../utils';
+import { ERRORS, COLLECTIONS } from '../config/constants';
 import './HydratePage.css';
 
 const totalLevel = 12;
@@ -10,41 +9,34 @@ const waterBlockHeight = 360 / totalLevel;
 const slope = 3;
 
 export default function HydratePage() {
-  const [waterLevel, setWaterLevel] = useState(0);
-  const [enable, setEnable] = useState(false);
+  const [hydrateLevel, setHydrateLevel] = useState(0);
+  const [enable, setEnable] = useState(true);
   const { setError, db, navigate } = useConfig();
 
-  const saveHydrateLevel = useCallback(
+  const setHydrate = useCallback(
     async (value) => {
-      value = waterLevel + value;
+      value = hydrateLevel + value;
       if (value < 0 || value > totalLevel) return;
       setError(null);
       setEnable(false);
-      const todayDate = getTodayDateString();
       try {
-        const routineDocRef = doc(db, 'env', REACT_APP_ENV, COLLECTIONS.ROUTINE, todayDate);
-        await setDoc(
-          routineDocRef,
-          {
-            date: todayDate,
-            level: value,
-            type: 'hydrate',
-            updatedAt: getTodayDatetimeString(),
-          },
-          { merge: true },
-        );
-        setWaterLevel(value);
+        const updateRecordFields = {
+          level: value,
+          type: 'hydrate',
+        };
+        await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields);
+        setHydrateLevel(value);
       } catch (err) {
         setError(err.message);
-        console.error('Error saving summary:', err);
+        console.error('Error saving hydrate routine:', err);
       } finally {
         setEnable(true);
       }
     },
-    [db, setError, waterLevel],
+    [db, setError, hydrateLevel],
   );
 
-  const loadHydrateLevel = useCallback(async () => {
+  const getHydrate = useCallback(async () => {
     if (!db) {
       setError(ERRORS.FIREBASE);
       return navigate('');
@@ -52,39 +44,28 @@ export default function HydratePage() {
     setError(null);
 
     try {
-      // Load Hydrate details for today
-      const todayDate = getTodayDateString();
-      const routineDocRef = doc(db, 'env', REACT_APP_ENV, COLLECTIONS.ROUTINE, todayDate);
-      const hydrateDoc = await getDoc(routineDocRef);
-      if (hydrateDoc.exists()) {
-        setWaterLevel(hydrateDoc.data().level || 0);
-      } else {
-        saveHydrateLevel(0);
-      }
+      // Get Hydrate details for today
+      const record = await getRecord(db, COLLECTIONS.ROUTINE);
+      setHydrateLevel(record?.level ?? 0);
     } catch (err) {
-      // Provide specific error messages based on error code
-      console.error('Firestore Error:', {
-        code: err.code,
-        message: err.message,
-        stack: err.stack,
-      });
+      console.error('Error getting hydrate routine:', err);
       setError(err.message);
     }
-  }, [db, navigate, saveHydrateLevel, setError]);
+  }, [db, navigate, setError]);
 
   useEffect(() => {
-    loadHydrateLevel();
-  }, [loadHydrateLevel]);
+    getHydrate();
+  }, [getHydrate]);
 
   return (
     <div style={{ textAlign: 'center' }}>
       <h2>Drink atleast 12 Glass of water daily</h2>
-      <GlassFrame isEmpty={!parseInt(waterLevel)} level={waterLevel} />
+      <GlassFrame isEmpty={!parseInt(hydrateLevel)} level={hydrateLevel} />
       <div>
-        <button id="add-btn" disabled={!enable} onClick={() => saveHydrateLevel(+1)}>
+        <button id="add-btn" disabled={!enable} onClick={() => setHydrate(+1)}>
           ➕
         </button>
-        <button id="del-btn" disabled={!enable} onClick={() => saveHydrateLevel(-1)}>
+        <button id="del-btn" disabled={!enable} onClick={() => setHydrate(-1)}>
           ➖
         </button>
       </div>

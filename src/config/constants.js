@@ -1,6 +1,7 @@
 export const REACT_APP_ENV = process.env.REACT_APP_ENV;
 export const IS_DEV = process.env.REACT_APP_ENV === 'dev';
 export const IS_PROD = process.env.REACT_APP_ENV === 'prod';
+export const DEBUG = process.env.REACT_APP_DEBUG;
 
 export const COLLECTIONS = {
   TASKS: 'tasks',

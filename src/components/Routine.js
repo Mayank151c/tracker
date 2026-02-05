@@ -1,14 +1,16 @@
-import { useState } from 'react';
-import TaskList from './TaskList';
+import RoutineList from './RoutineList';
 
-export default function Routine({ startDate, endDate }) {
-  const [tasks, setTasks] = useState([]);
+const routines = {
+  hydrate: true,
+};
+const allRoutinesDisabled = Object.values(routines).filter((item) => item).length === 0;
 
+export default function Routine() {
   return (
     <div className="tasks-section">
       <h2>Routine</h2>
-      <TaskList tasks={tasks} setTasks={setTasks} startDate={startDate} endDate={endDate} />
-      {tasks.length === 0 && <div id="empty-list">No Fitness routine tasks setup</div>}
+      {routines.hydrate && <RoutineList />}
+      {allRoutinesDisabled && <div id="empty-list">No routine tasks setup</div>}
     </div>
   );
 }
