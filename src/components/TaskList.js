@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
-import { REACT_APP_ENV } from '../config/constants';
+import { REACT_APP_ENV, ERRORS } from '../config/constants';
 import { useConfig } from '../utils';
 import './TaskList.css';
 
@@ -22,7 +22,7 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
   // Load tasks for selected date
   const loadTasks = useCallback(async () => {
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return navigate('');
     }
 
@@ -35,9 +35,8 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
       const tasksList = await getDocs(tasksQuery).then((snapshot) => {
         const list = [];
         snapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() }));
-        return list;
+        return list.sort((a, b) => a.completed - b.completed);
       });
-      tasksList.sort((a, b) => a.completed - b.completed);
       setTasks(tasksList);
     } catch (err) {
       // Provide specific error messages based on error code
@@ -55,7 +54,7 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
   // Delete a task
   const deleteTask = async (id) => {
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return;
     }
 
@@ -77,7 +76,7 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
   // Toggle task completion
   const toggleTask = async (id, currentStatus) => {
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return;
     }
 

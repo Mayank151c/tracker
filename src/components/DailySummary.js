@@ -1,9 +1,8 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 
 import Section from './Section';
-import { REACT_APP_ENV } from '../config/constants';
-import { getTodayDateString, useConfig } from '../utils';
+import { ERRORS, COLLECTIONS } from '../config/constants';
+import { useConfig, getRecord, setRecord } from '../utils';
 
 export default function DailySummary({ selectedDate }) {
   const { db, setError, navigate } = useConfig();
@@ -11,20 +10,12 @@ export default function DailySummary({ selectedDate }) {
   const [enable, setEnable] = useState(false);
   const [dailySummary, setDailySummary] = useState('');
 
-  // Save daily summary
-  const saveSummary = async () => {
-    setError(null);
+  const setSummary = async () => {
     try {
-      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, 'dailySummaries', selectedDate);
-      await setDoc(
-        summaryDocRef,
-        {
-          date: selectedDate,
-          summary: dailySummary.trim(),
-          updatedAt: getTodayDateString(),
-        },
-        { merge: true },
-      );
+      const updateRecordFields = {
+        summary: dailySummary.trim(),
+      };
+      await setRecord(db, COLLECTIONS.DAILY_SUMMARIES, updateRecordFields, selectedDate);
       setEnable(false);
     } catch (err) {
       setError(err.message);
@@ -32,31 +23,21 @@ export default function DailySummary({ selectedDate }) {
     }
   };
 
-  // Load summary for selected date
-  const loadSummary = useCallback(async () => {
+  const getSummary = useCallback(async () => {
     if (!db) {
-      setError('Firebase not initialized. Please configure first.');
+      setError(ERRORS.FIREBASE);
       return navigate('');
     }
 
     setError(null);
 
     try {
-      // Load summary for selected date
-      const summaryDocRef = doc(db, 'env', REACT_APP_ENV, 'dailySummaries', selectedDate);
-      const summaryDoc = await getDoc(summaryDocRef);
-      if (summaryDoc.exists()) {
-        setDailySummary(summaryDoc.data().summary || '');
-      } else {
-        setDailySummary('');
-      }
+      // Get summary for selected date
+      const summaryDoc = await getRecord(db, COLLECTIONS.DAILY_SUMMARIES, selectedDate);
+      setDailySummary(summaryDoc?.summary ?? '');
     } catch (err) {
-      // Provide specific error messages based on error code
-      console.error('Firestore Error:', {
-        code: err.code,
-        message: err.message,
-        stack: err.stack,
-      });
+      setError(err.message);
+      console.error('Error getting summary:', err);
     }
   }, [db, selectedDate, navigate, setError]);
 
@@ -66,8 +47,8 @@ export default function DailySummary({ selectedDate }) {
   };
 
   useEffect(() => {
-    loadSummary();
-  }, [selectedDate, loadSummary]);
+    getSummary();
+  }, [getSummary]);
 
   return (
     <>
@@ -80,7 +61,7 @@ export default function DailySummary({ selectedDate }) {
           className="summary-textarea"
           rows={dailySummary.split('\n').length}
         />
-        <button onClick={saveSummary} className="btn btn-primary" disabled={!enable}>
+        <button onClick={setSummary} className="btn btn-primary" disabled={!enable}>
           Save Summary
         </button>
       </Section>
