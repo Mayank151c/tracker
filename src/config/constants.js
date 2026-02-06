@@ -38,4 +38,10 @@ export const PAGES = {
     left: 'daily-task',
     right: false,
   },
+  'weight-routine': {
+    title: 'Weight Tracker',
+    path: 'weight-routine',
+    left: 'daily-task',
+    right: false,
+  },
 };

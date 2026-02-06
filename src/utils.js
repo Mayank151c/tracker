@@ -75,3 +75,7 @@ async function executeCallbackForRange(start, end, callback, range) {
 export const executeCallbackForDateRange = async (start, end, callback) => {
   return await executeCallbackForRange(start, end, callback, 1);
 };
+
+export function EmptyList(condition, message) {
+  return condition && <div id="empty-list">{message}</div>;
+}

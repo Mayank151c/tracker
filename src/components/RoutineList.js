@@ -4,13 +4,19 @@ import { getRecord, getTodayDateString, useConfig } from '../utils';
 import './RoutineList.css';
 
 export default function RoutineList() {
-  const { navigate } = useConfig();
-
   return (
     <div id="routine-list">
-      <div className="routine-item" onClick={() => navigate('hydrate-routine')}>
-        <HydrateRoutine />
-      </div>
+      <HydrateRoutine />
+      <WeightRoutine />
+    </div>
+  );
+}
+
+function RoutineItem(props) {
+  const { navigate } = useConfig();
+  return (
+    <div className="routine-item" onClick={() => navigate(props.path)}>
+      {props.children}
     </div>
   );
 }
@@ -41,10 +47,12 @@ function HydrateRoutine() {
   }, [getHydrate]);
 
   return (
-    <div>
-      <div>
-        Hydrate for {getTodayDateString()}: (Level: {hydrateLevel})
-      </div>
-    </div>
+    <RoutineItem path="hydrate-routine">
+      Hydrate for {getTodayDateString()}: (Level: {hydrateLevel})
+    </RoutineItem>
   );
+}
+
+function WeightRoutine() {
+  return <RoutineItem path="weight-routine">Weight Routine</RoutineItem>;
 }

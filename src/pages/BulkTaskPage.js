@@ -2,7 +2,7 @@ import { useState } from 'react';
 import AddTasks from '../components/AddTasks';
 import TaskList from '../components/TaskList';
 import DatePicker from '../components/DatePicker';
-import { getTodayDateString } from '../utils';
+import { EmptyList, getTodayDateString } from '../utils';
 import Section from '../components/Section';
 
 export default function BulkTask() {
@@ -11,7 +11,7 @@ export default function BulkTask() {
   const [endDate, setEndDate] = useState(getTodayDateString());
 
   return (
-    <div className="tasks-section">
+    <div>
       <Section horizontal={true}>
         <DatePicker label="Start Date" date={startDate} setDate={setStartDate} max={endDate} />
         <DatePicker
@@ -26,7 +26,7 @@ export default function BulkTask() {
 
       <TaskList bulk={true} startDate={startDate} endDate={endDate} tasks={tasks} setTasks={setTasks} />
 
-      {tasks.length === 0 && <div id="empty-list">No tasks for this day. Add one above!</div>}
+      {EmptyList(tasks.length === 0, 'No tasks for this day. Add one above!')}
     </div>
   );
 }

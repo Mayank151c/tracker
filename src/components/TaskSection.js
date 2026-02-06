@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AddTasks from './AddTasks';
 import TaskList from './TaskList';
+import { EmptyList } from '../utils';
 
 export default function TaskSection({ startDate, endDate }) {
   const [tasks, setTasks] = useState([]);
@@ -13,7 +14,7 @@ export default function TaskSection({ startDate, endDate }) {
 
       <TaskList tasks={tasks} setTasks={setTasks} startDate={startDate} endDate={endDate} />
 
-      {tasks.length === 0 && <div id="empty-list">No tasks for this day. Add one above!</div>}
+      {EmptyList(tasks.length === 0, 'No tasks for this day. Add one above!')}
     </div>
   );
 }

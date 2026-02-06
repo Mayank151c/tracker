@@ -1,9 +1,10 @@
 .container {
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 20px 60px rgba(255, 255, 255, 0.3);
   padding: 10px 30px 30px 30px;
   max-width: 800px;
   width: 100%;
+  min-height: 100vh;
 }
 
 nav {
@@ -11,19 +12,27 @@ nav {
   justify-content: space-between;
   align-items: center;
   position: absolute;
+  max-width: 800px;
+  padding: 0 30px;
+  width: 100%;
   left: 0;
   right: 0;
-  top: 20px;
-  margin: 0px 20px;
+  top: 10px;
+  margin: 0px auto;
 }
 
 nav button {
-  background: #0000;
-  border: 2px solid #fffd;
+  background: #625793;
+  border: 1px solid #ddd;
   border-radius: 10px;
-  padding: 5px;
+  padding: 9px;
   font-size: 1rem;
+  font-weight: 600;
   color: white;
+  &:hover {
+    cursor: pointer;
+    background: #4e4675;
+  }
 }
 
 h1 {

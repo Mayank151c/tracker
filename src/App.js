@@ -7,6 +7,7 @@ import BulkTaskPage from './pages/BulkTaskPage';
 import HydratePage from './pages/HydratePage';
 import FloatingError from './components/FloatingError';
 import { PAGES } from './config/constants';
+import WeightPage from './pages/WeightPage';
 
 export const AppContext = createContext(null);
 
@@ -41,8 +42,8 @@ export default function App() {
             <div>{PAGES[page]?.title || 'Title Not Found'}</div>
           </h1>
           <nav>
-            <div>{PAGES[page]?.left && <button onClick={() => navigate(PAGES[page]?.left)}>{'⬅️ ' + PAGES[PAGES[page]?.left].title}</button>}</div>
-            <div>{PAGES[page]?.right && <button onClick={() => navigate(PAGES[page]?.right)}>{PAGES[PAGES[page]?.right].title + ' ➡️'}</button>}</div>
+            <div>{PAGES[page]?.left && <button onClick={() => navigate(PAGES[page]?.left)}>{PAGES[PAGES[page]?.left].title}</button>}</div>
+            <div>{PAGES[page]?.right && <button onClick={() => navigate(PAGES[page]?.right)}>{PAGES[PAGES[page]?.right].title}</button>}</div>
           </nav>
         </div>
         {((path) => {
@@ -53,6 +54,8 @@ export default function App() {
               return <BulkTaskPage />;
             case 'hydrate-routine':
               return <HydratePage />;
+            case 'weight-routine':
+              return <WeightPage />;
             default:
               return <HealthCheck />;
           }
