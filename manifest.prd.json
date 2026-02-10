@@ -1,0 +1,11 @@
+{
+  "name": "Daily Planner",
+  "short_name": "Planner",
+  "icons": [{ "src": "icon.prd.png", "sizes": "192x192", "type": "image/png" }],
+  "start_url": ".",
+  "display": "fullscreen",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "orientation": "portrait",
+  "scope": "/"
+}

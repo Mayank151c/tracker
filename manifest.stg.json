@@ -1,7 +1,7 @@
 {
-  "name": "Daily Planner App",
+  "name": "Daily Planner Stg",
   "short_name": "Planner",
-  "icons": [{ "src": "icon.png", "sizes": "192x192", "type": "image/png" }],
+  "icons": [{ "src": "icon.stg.png", "sizes": "192x192", "type": "image/png" }],
   "start_url": ".",
   "display": "fullscreen",
   "background_color": "#FFFFFF",
