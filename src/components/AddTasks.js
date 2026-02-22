@@ -6,22 +6,22 @@ import { executeCallbackForDateRange, useConfig } from '../utils';
 export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
   const { db, setError } = useConfig();
 
-  const [taskInput, setTaskInput] = useState('');
-  const [addingTask, setAddingTask] = useState(false);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Add a new task
   const addTask = async () => {
-    if (!taskInput.trim() || addingTask) return;
+    if (!input.trim() || loading) return;
 
     if (!db) {
       setError(ERRORS.FIREBASE);
       return;
     }
 
-    const taskText = taskInput.trim();
-    setTaskInput(''); // Clear input immediately for better UX
+    const taskText = input.trim();
+    setInput(''); // Clear input immediately for better UX
     setError(null);
-    setAddingTask(true);
+    setLoading(true);
 
     try {
       const bulkId = taskText.toLowerCase().replace(/\W/g, '-');
@@ -39,27 +39,11 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
           .then(() => setTasks([...tasks, newTask]));
       });
     } catch (err) {
-      console.error('Firestore Error (addTask):', {
-        code: err.code,
-        message: err.message,
-      });
-
-      let errorMessage = 'Error adding task. ';
-
-      if (err.code === 'permission-denied') {
-        errorMessage = 'Permission denied. Please check your Firestore security rules allow write access.';
-      } else if (err.code === 'unavailable') {
-        errorMessage = 'Firestore unavailable. Please check your Firebase configuration and ensure Firestore is enabled.';
-      } else if (err.message?.includes('offline') || err.message?.includes('network')) {
-        errorMessage = 'Network error. Task will be saved when connection is restored.';
-      } else {
-        errorMessage += err.message || 'Please check your Firebase configuration.';
-      }
-
-      setError(errorMessage);
-      setTaskInput(taskText); // Restore input text on error
+      console.error('Error adding task:', err);
+      setError('Error adding task: ' + err.message);
+      setInput(taskText); // Restore input text on error
     } finally {
-      setAddingTask(false);
+      setLoading(false);
     }
   };
 
@@ -67,14 +51,14 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
     <div className="input-section">
       <input
         type="text"
-        value={taskInput}
-        onChange={(e) => setTaskInput(e.target.value)}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && addTask()}
         placeholder="Add a new task..."
         className="item-input"
       />
-      <button onClick={addTask} id="btn" className="btn btn-primary" disabled={!taskInput.trim() || addingTask}>
-        {addingTask ? (
+      <button onClick={addTask} id="btn" className="btn btn-primary" disabled={!input.trim() || loading}>
+        {loading ? (
           <span className="button-content">
             <span className="spinner"></span>
             Adding...

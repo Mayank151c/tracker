@@ -6,11 +6,11 @@ import { AppContext } from './App';
 /** Get a record from any Firestore Collection by date
  * @param {*} db A reference to the firestore instance
  * @param {String} collection name
- * @param {String} date `YYYY-MM-DD`
+ * @param {String} id default value `YYYY-MM-DD`
  * @returns
  */
-export async function getRecord(db, collection, date = getTodayDateString()) {
-  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, date);
+export async function getRecord(db, collection, id = getTodayDateString()) {
+  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, id);
   const record = await getDoc(recordRef);
   return record.exists() ? record.data() : null;
 }
@@ -19,16 +19,15 @@ export async function getRecord(db, collection, date = getTodayDateString()) {
  * @param {*} db A reference to the firestore instance
  * @param {String} collection name
  * @param {Object} data
- * @param {String} date `YYYY-MM-DD`
+ * @param {String} id default value `YYYY-MM-DD`
  * @returns
  */
-export async function setRecord(db, collection, data, date = getTodayDateString()) {
+export async function setRecord(db, collection, data, id = getTodayDateString()) {
   const record = {
-    date: date,
-    updatedAt: getTodayDatetimeString(),
     ...data,
+    updatedAt: getTodayDatetimeString(),
   };
-  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, date);
+  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, id);
   await setDoc(recordRef, record, { merge: true });
 }
 

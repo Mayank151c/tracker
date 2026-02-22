@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getRecord, setRecord, useConfig } from '../utils';
+import { getRecord, getTodayDateString, setRecord, useConfig } from '../utils';
 import { ERRORS, COLLECTIONS } from '../config/constants';
 import './HydratePage.css';
 
@@ -21,8 +21,9 @@ export default function HydratePage() {
       setEnable(false);
       try {
         const updateRecordFields = {
-          level: value,
+          date: getTodayDateString(),
           type: 'hydrate',
+          value: value,
         };
         await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields);
         setHydrateLevel(value);
