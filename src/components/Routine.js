@@ -1,4 +1,5 @@
 import RoutineList from './RoutineList';
+import { EmptyList } from '../utils';
 
 const routines = {
   hydrate: true,
@@ -10,7 +11,7 @@ export default function Routine() {
     <div className="tasks-section">
       <h2>Routine</h2>
       {routines.hydrate && <RoutineList />}
-      {allRoutinesDisabled && <div id="empty-list">No routine tasks setup</div>}
+      {EmptyList(allRoutinesDisabled, 'No routine tasks setup')}
     </div>
   );
 }

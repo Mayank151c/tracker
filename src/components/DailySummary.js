@@ -13,6 +13,7 @@ export default function DailySummary({ selectedDate }) {
   const setSummary = async () => {
     try {
       const updateRecordFields = {
+        date: selectedDate,
         summary: dailySummary.trim(),
       };
       await setRecord(db, COLLECTIONS.DAILY_SUMMARIES, updateRecordFields, selectedDate);

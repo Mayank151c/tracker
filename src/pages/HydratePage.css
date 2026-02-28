@@ -1,17 +1,32 @@
+#glass-block {
+  text-align: center;
+  margin-top: 20px;
+  border: 1px solid white;
+  border-radius: 20px;
+  box-shadow: white 0 0 10px;
+  padding: 20px;
+  button {
+    border: 0;
+    border-radius: 10px;
+    padding: 5px 50px;
+    margin: 20px 10px 0 10px;
+    font-size: 30px;
+    color: white;
+    text-shadow: white 0 0 2px;
+    box-shadow: rgba(245, 245, 245, 0.776) 1px 1px 5px;
+    &:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+  }
+}
+
 #add-btn {
-  padding: 15px 30px;
-  margin: 20px 10px;
-  border: 0;
-  border-radius: 10px;
   background: lightgreen;
 }
 
 #del-btn {
-  padding: 15px 30px;
-  margin: 20px 10px;
-  border: 0;
-  border-radius: 10px;
-  background: red;
+  background: #ff5555;
 }
 
 #water-label {

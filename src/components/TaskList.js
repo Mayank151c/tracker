@@ -5,19 +5,8 @@ import { useConfig } from '../utils';
 import './TaskList.css';
 
 export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) {
-  const { db, setError, navigate } = useConfig();
+  const { db, setError, navigate, deleteIcon } = useConfig();
   const [loading, setLoading] = useState(false);
-  const [deleteIcon, setDeleteIcon] = useState(null);
-
-  useEffect(() => {
-    async function fetchImage() {
-      fetch('https://img.icons8.com/glyph-neue/512/delete--v1.png')
-        .then((response) => response.blob())
-        .then((blob) => setDeleteIcon(URL.createObjectURL(blob)))
-        .catch((e) => console.error('Error fetching image', e));
-    }
-    fetchImage();
-  }, []);
 
   // Load tasks for selected date
   const loadTasks = useCallback(async () => {

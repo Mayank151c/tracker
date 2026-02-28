@@ -16,26 +16,17 @@ export const ERRORS = {
 export const PAGES = {
   '': {
     title: 'Health Check',
-    path: '',
-    left: false,
-    right: false,
   },
   'daily-task': {
     title: 'Daily Task',
-    path: 'daily-task',
-    left: false,
-    right: 'bulk-task',
   },
   'bulk-task': {
     title: 'Bulk Task',
-    path: 'bulk-task',
-    left: 'daily-task',
-    right: false,
   },
   'hydrate-routine': {
     title: 'Hydrate',
-    path: 'hydrate-routine',
-    left: 'daily-task',
-    right: false,
+  },
+  'weight-routine': {
+    title: 'Weight Tracker',
   },
 };
