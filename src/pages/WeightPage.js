@@ -1,20 +1,18 @@
-import { useState } from "react";
-import AddTasks from "../components/AddTasks";
-import { EmptyList, getTodayDateString } from "../utils";
-import Section from "../components/Section";
-import TaskList from "../components/TaskList";
+import { useState } from 'react';
+import { EmptyList } from '../utils';
+import Section from '../components/Section';
+import WeightList from '../components/WeightList';
+import AddWeight from '../components/AddWeight';
 
 export default function WeightPage() {
-	const [tasks, setTasks] = useState([]);
-	const [startDate, setStartDate] = useState(getTodayDateString());
+  const [weights, setWeights] = useState([]);
 
-	const averageWeight = 0;
   return (
-    <div style={{marginTop: "20px"}}>
-			<AddTasks tasks={tasks} setTasks={setTasks} startDate={startDate} endDate={startDate} />
-			<Section horizontal={true}>Average Weight: {averageWeight}</Section>
-			<TaskList tasks={tasks} setTasks={setTasks} startDate={'2026-01-15'} endDate={startDate} />
-			{EmptyList(tasks.length === 0, 'No weight check.')}
+    <div style={{ marginTop: '20px' }}>
+      <AddWeight weight={weights} setWeight={setWeights} />
+      <Section horizontal={true}>Last Weight: {weights[0]?.value ?? 'No weight record'}</Section>
+      <WeightList weights={weights} setWeights={setWeights} />
+      {EmptyList(weights.length === 0, 'No weight check.')}
     </div>
   );
 }

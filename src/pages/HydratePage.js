@@ -59,15 +59,15 @@ export default function HydratePage() {
   }, [getHydrate]);
 
   return (
-    <div style={{ textAlign: 'center' }}>
-      <h2>Drink atleast 12 Glass of water daily</h2>
+    <div id="glass-block">
+      <h2>Drink 12 Glass of Water</h2>
       <GlassFrame isEmpty={!parseInt(hydrateLevel)} level={hydrateLevel} />
       <div>
         <button id="add-btn" disabled={!enable} onClick={() => setHydrate(+1)}>
-          ➕
+          +
         </button>
         <button id="del-btn" disabled={!enable} onClick={() => setHydrate(-1)}>
-          ➖
+          -
         </button>
       </div>
     </div>

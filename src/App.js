@@ -1,4 +1,4 @@
-import { useState, createContext } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import './App.css';
 
 import HealthCheck from './pages/HealthCheckPage';
@@ -14,7 +14,17 @@ export const AppContext = createContext(null);
 export default function App() {
   const [db, setDb] = useState(null);
   const [error, setError] = useState(null);
+  const [deleteIcon, setDeleteIcon] = useState(null);
   const [page, setPage] = useState(window.location.hash.slice(1));
+
+  useEffect(() => {
+    (async () => {
+      fetch('https://img.icons8.com/glyph-neue/512/delete--v1.png')
+        .then((response) => response.blob())
+        .then((blob) => setDeleteIcon(URL.createObjectURL(blob)))
+        .catch((e) => console.error('Error fetching image', e));
+    })();
+  }, []);
 
   // updates URL without re-render
   const navigate = (newPath) => {
@@ -30,6 +40,7 @@ export default function App() {
         setDb,
         error,
         setError,
+        deleteIcon,
       }}
     >
       {/* Error Display */}
@@ -42,8 +53,11 @@ export default function App() {
             <div>{PAGES[page]?.title || 'Title Not Found'}</div>
           </h1>
           <nav>
-            <div>{PAGES[page]?.left && <button onClick={() => navigate(PAGES[page]?.left)}>{PAGES[PAGES[page]?.left].title}</button>}</div>
-            <div>{PAGES[page]?.right && <button onClick={() => navigate(PAGES[page]?.right)}>{PAGES[PAGES[page]?.right].title}</button>}</div>
+            {page !== '' &&
+              Object.keys(PAGES).map((hashPath) => {
+                if (['', page].includes(hashPath)) return null;
+                return <button onClick={() => navigate(hashPath)}>{PAGES[hashPath].title}</button>;
+              })}
           </nav>
         </div>
         {((path) => {

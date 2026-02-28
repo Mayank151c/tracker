@@ -48,11 +48,11 @@ function HydrateRoutine() {
 
   return (
     <RoutineItem path="hydrate-routine">
-      Hydrate for {getTodayDateString()}: (Level: {hydrateLevel})
+      Hydrate Goal ({getTodayDateString()}) ({hydrateLevel}/12)
     </RoutineItem>
   );
 }
 
 function WeightRoutine() {
-  return <RoutineItem path="weight-routine">Weight Routine</RoutineItem>;
+  return <RoutineItem path="weight-routine">Weight Tracking</RoutineItem>;
 }
