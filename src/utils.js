@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { REACT_APP_ENV } from './config/constants';
 import { AppContext } from './App';
 
 /** Get a record from any Firestore Collection by date
@@ -10,7 +9,7 @@ import { AppContext } from './App';
  * @returns
  */
 export async function getRecord(db, collection, id = getTodayDateString()) {
-  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, id);
+  const recordRef = doc(db, collection, id);
   const record = await getDoc(recordRef);
   return record.exists() ? record.data() : null;
 }
@@ -25,9 +24,9 @@ export async function getRecord(db, collection, id = getTodayDateString()) {
 export async function setRecord(db, collection, data, id = getTodayDateString()) {
   const record = {
     ...data,
-    updatedAt: getTodayDatetimeString(),
+    updatedAt: Date.now(),
   };
-  const recordRef = doc(db, 'env', REACT_APP_ENV, collection, id);
+  const recordRef = doc(db, collection, id);
   await setDoc(recordRef, record, { merge: true });
 }
 

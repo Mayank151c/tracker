@@ -1,25 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
-import { REACT_APP_ENV, ERRORS } from '../config/constants';
+import { COLLECTIONS } from '../config/constants';
 import { useConfig } from '../utils';
 import './TaskList.css';
 
 export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) {
-  const { db, setError, navigate, deleteIcon } = useConfig();
+  const { db, setError, deleteIcon, checkDbConnection } = useConfig();
   const [loading, setLoading] = useState(false);
 
   // Load tasks for selected date
   const loadTasks = useCallback(async () => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return navigate('');
-    }
-
     setLoading(true);
-    setError(null);
-
     try {
-      const tasksCollection = collection(db, 'env', REACT_APP_ENV, 'tasks');
+      checkDbConnection();
+      const tasksCollection = collection(db, COLLECTIONS.TASKS);
       const tasksQuery = query(tasksCollection, where('date', '>=', startDate), where('date', '<=', endDate), orderBy('date'));
       const tasksList = await getDocs(tasksQuery).then((snapshot) => {
         const list = [];
@@ -38,20 +32,14 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
     } finally {
       setLoading(false);
     }
-  }, [db, endDate, setError, setTasks, navigate, startDate]);
+  }, [db, endDate, setError, setTasks, startDate, checkDbConnection]);
 
   // Delete a task
   const deleteTask = async (id) => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return;
-    }
-
     setLoading(true);
-    setError(null);
-
     try {
-      const taskDoc = doc(db, 'env', REACT_APP_ENV, 'tasks', id);
+      checkDbConnection();
+      const taskDoc = doc(db, COLLECTIONS.TASKS, id);
       await deleteDoc(taskDoc);
       await loadTasks();
     } catch (err) {
@@ -64,18 +52,13 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
 
   // Toggle task completion
   const toggleTask = async (id, currentStatus) => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return;
-    }
-
     setLoading(true);
-    setError(null);
-
     try {
-      const taskDoc = doc(db, 'env', REACT_APP_ENV, 'tasks', id);
+      checkDbConnection();
+      const taskDoc = doc(db, COLLECTIONS.TASKS, id);
       await updateDoc(taskDoc, {
         completed: !currentStatus,
+        updatedAt: Date.now(),
       });
       await loadTasks();
     } catch (err) {

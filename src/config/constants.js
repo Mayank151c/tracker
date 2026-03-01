@@ -4,9 +4,9 @@ export const IS_PROD = process.env.REACT_APP_ENV === 'prod';
 export const DEBUG = process.env.REACT_APP_DEBUG;
 
 export const COLLECTIONS = {
-  TASKS: 'tasks',
-  DAILY_SUMMARIES: 'dailySummaries',
-  ROUTINE: 'routine',
+  TASKS: `env/${REACT_APP_ENV}/tasks`,
+  DAILY_SUMMARIES: `env/${REACT_APP_ENV}/daily-summaries`,
+  ROUTINE: `env/${REACT_APP_ENV}/routine`,
 };
 
 export const ERRORS = {
@@ -24,9 +24,9 @@ export const PAGES = {
     title: 'Bulk Task',
   },
   'hydrate-routine': {
-    title: 'Hydrate',
+    title: 'Hydrate Monitor',
   },
   'weight-routine': {
-    title: 'Weight Tracker',
+    title: 'Weight Monitor',
   },
 };

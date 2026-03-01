@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import Section from './Section';
-import { ERRORS, COLLECTIONS } from '../config/constants';
+import { COLLECTIONS } from '../config/constants';
 import { useConfig, getRecord, setRecord } from '../utils';
 
 export default function DailySummary({ selectedDate }) {
-  const { db, setError, navigate } = useConfig();
+  const { db, setError, checkDbConnection } = useConfig();
 
   const [enable, setEnable] = useState(false);
   const [dailySummary, setDailySummary] = useState('');
@@ -15,6 +15,7 @@ export default function DailySummary({ selectedDate }) {
       const updateRecordFields = {
         date: selectedDate,
         summary: dailySummary.trim(),
+        updatedAt: Date.now(),
       };
       await setRecord(db, COLLECTIONS.DAILY_SUMMARIES, updateRecordFields, selectedDate);
       setEnable(false);
@@ -25,14 +26,8 @@ export default function DailySummary({ selectedDate }) {
   };
 
   const getSummary = useCallback(async () => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return navigate('');
-    }
-
-    setError(null);
-
     try {
+      checkDbConnection();
       // Get summary for selected date
       const summaryDoc = await getRecord(db, COLLECTIONS.DAILY_SUMMARIES, selectedDate);
       setDailySummary(summaryDoc?.summary ?? '');
@@ -40,7 +35,7 @@ export default function DailySummary({ selectedDate }) {
       setError(err.message);
       console.error('Error getting summary:', err);
     }
-  }, [db, selectedDate, navigate, setError]);
+  }, [db, selectedDate, setError, checkDbConnection]);
 
   const handleSummaryUpdate = (e) => {
     setDailySummary(e.target.value);

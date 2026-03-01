@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getRecord, getTodayDateString, setRecord, useConfig } from '../utils';
-import { ERRORS, COLLECTIONS } from '../config/constants';
+import { COLLECTIONS } from '../config/constants';
 import './HydratePage.css';
 
 const totalLevel = 12;
@@ -11,22 +11,23 @@ const slope = 3;
 export default function HydratePage() {
   const [hydrateLevel, setHydrateLevel] = useState(0);
   const [enable, setEnable] = useState(true);
-  const { setError, db, navigate } = useConfig();
+  const { setError, db, checkDbConnection } = useConfig();
 
   const setHydrate = useCallback(
-    async (value) => {
-      value = hydrateLevel + value;
-      if (value < 0 || value > totalLevel) return;
+    async (level) => {
+      level = hydrateLevel + level;
+      if (level < 0 || level > totalLevel) return;
       setError(null);
       setEnable(false);
       try {
+        const date = getTodayDateString();
         const updateRecordFields = {
-          date: getTodayDateString(),
+          date: date,
           type: 'hydrate',
-          value: value,
+          level: level,
         };
-        await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields);
-        setHydrateLevel(value);
+        await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields, `hydrate-${date}`);
+        setHydrateLevel(level);
       } catch (err) {
         setError(err.message);
         console.error('Error saving hydrate routine:', err);
@@ -38,21 +39,17 @@ export default function HydratePage() {
   );
 
   const getHydrate = useCallback(async () => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return navigate('');
-    }
-    setError(null);
-
     try {
+      checkDbConnection();
+      const date = getTodayDateString();
       // Get Hydrate details for today
-      const record = await getRecord(db, COLLECTIONS.ROUTINE);
+      const record = await getRecord(db, COLLECTIONS.ROUTINE, `hydrate-${date}`);
       setHydrateLevel(record?.level ?? 0);
     } catch (err) {
       console.error('Error getting hydrate routine:', err);
       setError(err.message);
     }
-  }, [db, navigate, setError]);
+  }, [db, setError, checkDbConnection]);
 
   useEffect(() => {
     getHydrate();

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ERRORS, COLLECTIONS } from '../config/constants';
+import { COLLECTIONS } from '../config/constants';
 import { getRecord, getTodayDateString, useConfig } from '../utils';
 import './RoutineList.css';
 
@@ -23,24 +23,19 @@ function RoutineItem(props) {
 
 function HydrateRoutine() {
   const [hydrateLevel, setHydrateLevel] = useState(0);
-  const { db, setError, navigate } = useConfig();
+  const { db, setError, checkDbConnection } = useConfig();
 
   // 	Get hydrate routine for today
   const getHydrate = useCallback(async () => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return navigate('');
-    }
-    setError(null);
-
     try {
-      const record = await getRecord(db, COLLECTIONS.ROUTINE);
+      checkDbConnection();
+      const record = await getRecord(db, COLLECTIONS.ROUTINE, `hydrate-${getTodayDateString()}`);
       setHydrateLevel(record?.level ?? 0);
     } catch (err) {
       console.error('Error getting hydrate routine:', err);
       setError(err.message);
     }
-  }, [db, setError, navigate]);
+  }, [db, setError, checkDbConnection]);
 
   useEffect(() => {
     getHydrate();
@@ -48,11 +43,11 @@ function HydrateRoutine() {
 
   return (
     <RoutineItem path="hydrate-routine">
-      Hydrate Goal ({getTodayDateString()}) ({hydrateLevel}/12)
+      Hydrate Monitor ({getTodayDateString()}) ({hydrateLevel}/12)
     </RoutineItem>
   );
 }
 
 function WeightRoutine() {
-  return <RoutineItem path="weight-routine">Weight Tracking</RoutineItem>;
+  return <RoutineItem path="weight-routine">Weight Monitor</RoutineItem>;
 }

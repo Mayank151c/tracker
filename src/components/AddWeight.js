@@ -1,31 +1,37 @@
 import { useState } from 'react';
-import { ERRORS, COLLECTIONS } from '../config/constants';
-import { getTodayDateString, getTodayDatetimeString, setRecord, useConfig } from '../utils';
+import { COLLECTIONS } from '../config/constants';
+import { getRecord, getTodayDateString, setRecord, useConfig } from '../utils';
 
 export default function AddWeight() {
-  const { db, setError } = useConfig();
+  const { db, setError, checkDbConnection } = useConfig();
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const addWeight = async () => {
     if (!input || loading) return;
-    if (!db) throw new Error(ERRORS.FIREBASE);
-
-    const parsedInput = Number(input);
-    if (isNaN(parsedInput)) throw new Error('Invalid input');
-
-    setError(null);
     setLoading(true);
+    const parsedInput = Number(input);
 
     try {
-      const datetime = getTodayDatetimeString();
-      const newRecord = {
-        date: getTodayDateString(),
+      if (isNaN(parsedInput)) throw new Error('Invalid input');
+      checkDbConnection();
+      const date = getTodayDateString();
+      let [count, weight] = [1, parsedInput];
+      // update weight if it already exists
+      const weightDoc = await getRecord(db, COLLECTIONS.ROUTINE, `weight-${date}`);
+      if (weightDoc) {
+        weight = weightDoc.weight * weightDoc.count + parsedInput;
+        count = weightDoc.count + 1;
+        weight = parseInt((weight * 100) / count) / 100; // average weight
+      }
+      const updatedRecordFields = {
+        date: date,
         type: 'weight',
-        value: parsedInput,
+        weight: weight,
+        count: count,
       };
-      await setRecord(db, COLLECTIONS.ROUTINE, newRecord, `weight-${datetime}`);
+      await setRecord(db, COLLECTIONS.ROUTINE, updatedRecordFields, `weight-${date}`);
     } catch (err) {
       console.error('Error adding weight:', err);
       setError('Error adding weight: ' + err.message);

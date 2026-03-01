@@ -6,7 +6,7 @@ import DailyTaskPage from './pages/DailyTaskPage';
 import BulkTaskPage from './pages/BulkTaskPage';
 import HydratePage from './pages/HydratePage';
 import FloatingError from './components/FloatingError';
-import { PAGES } from './config/constants';
+import { ERRORS, PAGES } from './config/constants';
 import WeightPage from './pages/WeightPage';
 
 export const AppContext = createContext(null);
@@ -32,6 +32,15 @@ export default function App() {
     window.history.pushState({}, '', `#${newPath}`);
   };
 
+  // Validate database connection
+  const checkDbConnection = () => {
+    if (!db) {
+      navigate('');
+      throw new Error(ERRORS.FIREBASE);
+    }
+    setError(null);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -41,6 +50,7 @@ export default function App() {
         error,
         setError,
         deleteIcon,
+        checkDbConnection,
       }}
     >
       {/* Error Display */}

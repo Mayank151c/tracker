@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, deleteDoc, doc, query, where, orderBy, documentId, onSnapshot } from 'firebase/firestore';
-import { REACT_APP_ENV, ERRORS, COLLECTIONS } from '../config/constants';
-import { useConfig } from '../utils';
+import { COLLECTIONS } from '../config/constants';
+import { getTodayDatetimeString, useConfig } from '../utils';
 import './TaskList.css';
 
 export default function WeightList({ weights, setWeights }) {
-  const { db, setError, navigate, deleteIcon } = useConfig();
+  const { db, setError, deleteIcon, checkDbConnection } = useConfig();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     try {
-      const weightCollection = collection(db, 'env', REACT_APP_ENV, COLLECTIONS.ROUTINE);
-      const weightQuery = query(weightCollection, where(documentId(), '>=', 'weight-'), orderBy('updatedAt', 'desc'));
+      const weightCollection = collection(db, COLLECTIONS.ROUTINE);
+      const weightQuery = query(weightCollection, where(documentId(), '>=', 'weight'), orderBy('date', 'desc'));
       const unsubscribe = onSnapshot(weightQuery, (snapshot) => {
         const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setWeights(data); // Automatically updates UI when collection changes
@@ -25,16 +25,10 @@ export default function WeightList({ weights, setWeights }) {
 
   // Load weights for selected date
   const loadWeights = useCallback(async () => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return navigate('');
-    }
-
     setLoading(true);
-    setError(null);
-
     try {
-      const weightCollection = collection(db, 'env', REACT_APP_ENV, COLLECTIONS.ROUTINE);
+      checkDbConnection();
+      const weightCollection = collection(db, COLLECTIONS.ROUTINE);
       // where id string start with 'weight-'
       const weightQuery = query(weightCollection, where(documentId(), '>=', 'weight-'), orderBy('updatedAt', 'desc'));
       const weightList = await getDocs(weightQuery).then((snapshot) => {
@@ -49,19 +43,14 @@ export default function WeightList({ weights, setWeights }) {
     } finally {
       setLoading(false);
     }
-  }, [db, setError, setWeights, navigate]);
+  }, [db, setError, setWeights, checkDbConnection]);
 
   // Delete a task
   const deleteWeight = async (id) => {
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return;
-    }
     setLoading(true);
-    setError(null);
-
     try {
-      const taskDoc = doc(db, 'env', REACT_APP_ENV, COLLECTIONS.ROUTINE, id);
+      checkDbConnection();
+      const taskDoc = doc(db, COLLECTIONS.ROUTINE, id);
       await deleteDoc(taskDoc);
     } catch (err) {
       setError(err.message);
@@ -82,9 +71,9 @@ export default function WeightList({ weights, setWeights }) {
         weights.map((weightRecord) => (
           <div key={weightRecord.id} className="task-item">
             <div className="task-text">
-              <b>Weight:</b> {weightRecord.value} <b>Kg</b>
+              <b>Weight:</b> {weightRecord.weight} <b>Kg</b>
             </div>
-            <div>{weightRecord.updatedAt}</div>
+            <div>{getTodayDatetimeString(new Date(weightRecord.updatedAt))}</div>
             {/* Delete button */}
             <button onClick={() => deleteWeight(weightRecord.id)} id="btn-delete">
               <img src={deleteIcon} alt="delete--v1" width={20} height={24} />

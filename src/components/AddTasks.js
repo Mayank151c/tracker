@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { REACT_APP_ENV, ERRORS } from '../config/constants';
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { COLLECTIONS } from '../config/constants';
+import { addDoc, collection } from 'firebase/firestore';
 import { executeCallbackForDateRange, useConfig } from '../utils';
 
 export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
-  const { db, setError } = useConfig();
+  const { db, setError, checkDbConnection } = useConfig();
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,26 +13,21 @@ export default function AddTasks({ tasks, setTasks, startDate, endDate }) {
   const addTask = async () => {
     if (!input.trim() || loading) return;
 
-    if (!db) {
-      setError(ERRORS.FIREBASE);
-      return;
-    }
-
     const taskText = input.trim();
     setInput(''); // Clear input immediately for better UX
-    setError(null);
     setLoading(true);
 
     try {
+      checkDbConnection();
       const bulkId = taskText.toLowerCase().replace(/\W/g, '-');
-      const tasksCollection = collection(db, 'env', REACT_APP_ENV, 'tasks');
+      const tasksCollection = collection(db, COLLECTIONS.TASKS);
       await executeCallbackForDateRange(startDate, endDate, async (date) => {
         const newTask = {
           text: taskText,
           date: date,
           completed: false,
           bulkId: bulkId,
-          createdAt: Timestamp.now(),
+          updatedAt: Date.now(),
         };
         await addDoc(tasksCollection, newTask)
           .then((doc) => (newTask.id = doc.id))
