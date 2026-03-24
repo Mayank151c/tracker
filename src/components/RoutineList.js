@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { COLLECTIONS } from '../config/constants';
-import { getRecord, getTodayDateString, useConfig } from '../utils';
+import { getRecord, getRecordByField, getTodayDateString, useConfig } from '../utils';
 import './RoutineList.css';
+import TextUI from './elements/TextUI';
 
 export default function RoutineList() {
   return (
@@ -41,13 +42,41 @@ function HydrateRoutine() {
     getHydrate();
   }, [getHydrate]);
 
+  const showIconText = (text = '') => {
+    for (let i = 0; i < 12; i++) {
+      text += i < hydrateLevel ? '●' : '○';
+    }
+    return text;
+  };
   return (
     <RoutineItem path="hydrate-routine">
-      Hydrate Monitor ({getTodayDateString()}) ({hydrateLevel}/12)
+      Hydrate Monitor
+      <TextUI text={showIconText()} />
     </RoutineItem>
   );
 }
 
 function WeightRoutine() {
-  return <RoutineItem path="weight-routine">Weight Monitor</RoutineItem>;
+  const [weight, setWeight] = useState(0);
+  const { db, setError, checkDbConnection } = useConfig();
+
+  // 	Get hydrate routine for today
+  const getWeight = useCallback(async () => {
+    try {
+      checkDbConnection();
+      const record = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', getTodayDateString(), 'type', 'weight');
+      setWeight(record?.weight ?? 0);
+    } catch (err) {
+      console.error('Error getting hydrate routine:', err);
+      setError(err.message);
+    }
+  }, [db, setError, checkDbConnection]);
+
+  useEffect(() => getWeight, [getWeight]);
+
+  return (
+    <RoutineItem path="weight-routine">
+      Weight Monitor <TextUI text={weight ? `${weight} Kg` : 'N/A'} />
+    </RoutineItem>
+  );
 }

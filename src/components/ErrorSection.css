@@ -1,0 +1,27 @@
+#error {
+  color: red;
+  font-size: 14px;
+  padding: 3px 0 5px 10px;
+  background: rgb(253, 212, 218);
+  border-radius: 10px;
+}
+
+#progress {
+  position: relative;
+  color: black;
+  height: 2px;
+  /* height: 15px; */
+  background: red;
+  margin: 0 10px 3px 10px;
+  border-bottom-left-radius: 10px;
+  animation: progress-bar 3s linear;
+}
+
+@keyframes progress-bar {
+  0% {
+    width: 0;
+  }
+  95% {
+    width: 95%;
+  }
+}

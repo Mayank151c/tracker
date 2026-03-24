@@ -1,14 +1,14 @@
 import { useState } from 'react';
-
 import DailySummary from '../components/DailySummary';
 import Section from '../components/Section';
-import TaskSection from '../components/TaskSection';
 import Routine from '../components/Routine';
 import DatePicker from '../components/DatePicker';
+import TaskList from '../components/TaskList';
 import { getTodayDateString } from '../utils';
 
 export default function DailyTaskPage() {
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
+  const [tasks, setTasks] = useState([]);
 
   return (
     <div>
@@ -16,7 +16,12 @@ export default function DailyTaskPage() {
         <DatePicker label="Select Date:" date={selectedDate} setDate={setSelectedDate} />
       </Section>
 
-      <TaskSection startDate={selectedDate} endDate={selectedDate} />
+      {/* My Tasks Section */}
+      <div className="tasks-section">
+        <h2>Todo</h2>
+        <TaskList tasks={tasks} setTasks={setTasks} startDate={selectedDate} endDate={selectedDate} delBtn={false} isDailyPage={true} />
+      </div>
+
       <Routine startDate={selectedDate} endDate={selectedDate} />
       <DailySummary selectedDate={selectedDate} />
     </div>

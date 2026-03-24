@@ -1,41 +1,50 @@
 import { useState } from 'react';
 import { COLLECTIONS } from '../config/constants';
-import { getRecord, getTodayDateString, setRecord, useConfig } from '../utils';
+import { getRecordByField, getTodayDateString, setRecord, useConfig } from '../utils';
 
-export default function AddWeight() {
+const parseWeight = (weight) => Number(weight.toFixed(2));
+
+function createWeightRecord(weight, weightDoc = null) {
+  if (weightDoc) {
+    weight += weightDoc.weight * weightDoc.count;
+    weightDoc.count += 1;
+    return {
+      ...weightDoc,
+      weight: parseWeight(weight / weightDoc.count),
+    };
+  } else {
+    return {
+      date: getTodayDateString(),
+      type: 'weight',
+      count: 1,
+      weight: parseWeight(weight),
+    };
+  }
+}
+
+export default function AddWeight({ weights, setWeights }) {
   const { db, setError, checkDbConnection } = useConfig();
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const addWeight = async () => {
-    if (!input || loading) return;
     setLoading(true);
-    const parsedInput = Number(input);
-
+    const weight = Number(input);
+    const date = getTodayDateString();
     try {
-      if (isNaN(parsedInput)) throw new Error('Invalid input');
       checkDbConnection();
-      const date = getTodayDateString();
-      let [count, weight] = [1, parsedInput];
-      // update weight if it already exists
-      const weightDoc = await getRecord(db, COLLECTIONS.ROUTINE, `weight-${date}`);
-      if (weightDoc) {
-        weight = weightDoc.weight * weightDoc.count + parsedInput;
-        count = weightDoc.count + 1;
-        weight = parseInt((weight * 100) / count) / 100; // average weight
-      }
-      const updatedRecordFields = {
-        date: date,
-        type: 'weight',
-        weight: weight,
-        count: count,
-      };
-      await setRecord(db, COLLECTIONS.ROUTINE, updatedRecordFields, `weight-${date}`);
+      if (isNaN(weight)) throw new Error('Invalid input');
+      // Update weight if it already exists
+      const weightDoc = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', date, 'type', 'weight');
+      const updatedRecordFields = createWeightRecord(weight, weightDoc);
+      await setRecord(db, COLLECTIONS.ROUTINE, updatedRecordFields, weightDoc?.id).then((docId) => {
+        updatedRecordFields.id = docId;
+        setWeights(weights.filter((weight) => weight.id !== docId).insert(0, updatedRecordFields));
+      });
     } catch (err) {
       console.error('Error adding weight:', err);
       setError('Error adding weight: ' + err.message);
-      setInput(parsedInput); // Restore input text on error
     } finally {
       setLoading(false);
       setInput('');
@@ -53,7 +62,7 @@ export default function AddWeight() {
         placeholder="Add Weight..."
         className="item-input"
       />
-      <button onClick={addWeight} id="btn" className="btn btn-primary" disabled={loading}>
+      <button onClick={addWeight} id="btn-add" className="btn btn-primary" disabled={loading || !input}>
         {loading ? (
           <span className="button-content">
             <span className="spinner"></span>

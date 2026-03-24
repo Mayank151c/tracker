@@ -1,45 +1,56 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { COLLECTIONS } from '../config/constants';
-import { useConfig } from '../utils';
+import { EmptyList, getRecord, setRecord, useConfig } from '../utils';
 import './TaskList.css';
+import TextUI from './elements/TextUI';
+import DeleteBtn from './elements/DeleteBtn';
 
-export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) {
+export default function TaskList({ tasks, setTasks, startDate, endDate, selectedTaskIds, setSelectedTaskIds, isDailyPage = false, isTaskPool = false }) {
   const { db, setError, deleteIcon, checkDbConnection } = useConfig();
   const [loading, setLoading] = useState(false);
+  const collectionName = isTaskPool ? COLLECTIONS.TASK_POOL : COLLECTIONS.TASK_LIST;
 
-  // Load tasks for selected date
   const loadTasks = useCallback(async () => {
     setLoading(true);
     try {
       checkDbConnection();
-      const tasksCollection = collection(db, COLLECTIONS.TASKS);
-      const tasksQuery = query(tasksCollection, where('date', '>=', startDate), where('date', '<=', endDate), orderBy('date'));
-      const tasksList = await getDocs(tasksQuery).then((snapshot) => {
-        const list = [];
-        snapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() }));
-        return list.sort((a, b) => a.completed - b.completed);
-      });
-      setTasks(tasksList);
+      const tasksCollection = collection(db, collectionName);
+      const queryPayload = [tasksCollection];
+      if (!isTaskPool) {
+        queryPayload.push(where('date', '>=', startDate));
+        queryPayload.push(where('date', '<=', endDate));
+      }
+      const tasksQuery = query(...queryPayload);
+
+      const snapshot = await getDocs(tasksQuery);
+      const list = [];
+      snapshot.forEach((doc) => list.push({ id: doc.id, text: null, ...doc.data() }));
+
+      const tasksPopulatePromise = [];
+      if (!isTaskPool) {
+        for (const task of list) {
+          if (task.text === null) {
+            await getRecord(db, COLLECTIONS.TASK_POOL, task.taskId).then(({ text }) => {
+              task.text = text;
+            });
+          }
+        }
+      }
+      setTasks(list);
     } catch (err) {
-      // Provide specific error messages based on error code
-      console.error('Firestore Error:', {
-        code: err.code,
-        message: err.message,
-        stack: err.stack,
-      });
       setError(err.message);
+      console.error('Error loading tasks:', err);
     } finally {
       setLoading(false);
     }
-  }, [db, endDate, setError, setTasks, startDate, checkDbConnection]);
+  }, [db, setError, startDate, endDate, setTasks, checkDbConnection]);
 
-  // Delete a task
   const deleteTask = async (id) => {
     setLoading(true);
     try {
       checkDbConnection();
-      const taskDoc = doc(db, COLLECTIONS.TASKS, id);
+      const taskDoc = doc(db, collectionName, id);
       await deleteDoc(taskDoc);
       await loadTasks();
     } catch (err) {
@@ -50,87 +61,56 @@ export default function TaskList({ bulk, startDate, endDate, tasks, setTasks }) 
     }
   };
 
-  // Toggle task completion
-  const toggleTask = async (id, currentStatus) => {
-    setLoading(true);
-    try {
-      checkDbConnection();
-      const taskDoc = doc(db, COLLECTIONS.TASKS, id);
-      await updateDoc(taskDoc, {
-        completed: !currentStatus,
-        updatedAt: Date.now(),
-      });
-      await loadTasks();
-    } catch (err) {
-      setError(err.message);
-      console.error('Error updating task:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const listByBulkId = (tasks) => {
-    const result = tasks.reduce((result, task) => {
-      if (result[task.bulkId]) {
-        result[task.bulkId].begin = result[task.bulkId].begin > task.date ? task.date : result[task.bulkId].begin;
-        result[task.bulkId].end = result[task.bulkId].end < task.date ? task.date : result[task.bulkId].end;
-      } else {
-        result[task.bulkId] = {
-          ...task,
-          begin: task.date,
-          end: task.date,
-        };
-      }
-      return result;
-    }, {});
-    return Object.values(result);
-  };
-
   // Reload data when date changes or when db becomes available
   useEffect(() => {
     loadTasks();
-  }, [startDate, endDate, loadTasks]);
+  }, [loadTasks]);
+
+  async function handleTaskCompletion(e, taskId) {
+    tasks.map((task) => {
+      if (taskId === task.id) {
+        task.completed = e.target.checked;
+        console.log(task);
+        setRecord(db, collectionName, { completed: task.completed }, task.id).then((id) => {
+          setTasks([...tasks.filter((t) => id !== t.id), task]);
+        });
+      }
+    });
+  }
+
+  function handleSelectedTask(e, taskId) {
+    if (e.target.checked) {
+      setSelectedTaskIds([...selectedTaskIds, taskId]);
+    } else {
+      setSelectedTaskIds(selectedTaskIds.filter((id) => id !== taskId));
+    }
+  }
+
+  function handleCheckButton(e, taskId) {
+    !isDailyPage && handleSelectedTask(e, taskId);
+  }
 
   return (
     <div className="tasks-list">
-      {listByBulkId(tasks).map((task) => (
-        <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+      {tasks.map((task) => (
+        <div key={task.id} className="task-item">
           {/* Task checkbox */}
-          {!bulk && (
-            <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id, task.completed)} className="task-checkbox" disabled={loading} />
+          {!isDailyPage && isTaskPool && <input type="checkbox" onClick={(e) => handleCheckButton(e, task.id)} className="task-checkbox" disabled={loading} />}
+          {isDailyPage && (
+            <input type="checkbox" onChange={(e) => handleTaskCompletion(e, task.id)} checked={task.completed} className="task-checkbox" disabled={loading} />
           )}
 
           {/* Task Description */}
-          <div className="task-text" onClick={() => toggleTask(task.id, task.completed)}>
-            {task.text}
-          </div>
+          <div className="task-text">{task.text}</div>
 
-          {/* Date Range */}
-          {bulk && (
-            <>
-              <div className="task-date">
-                <div>
-                  <b>From :</b>
-                </div>{' '}
-                {task.begin}
-              </div>
-              <div className="task-date">
-                <div>
-                  <b>To :</b>
-                </div>{' '}
-                {task.end}
-              </div>
-            </>
-          )}
+          {/* Date */}
+          {!isDailyPage && !isTaskPool && <TextUI date={task.date} />}
 
           {/* Delete button */}
-          {!task.completed && (
-            <button onClick={() => deleteTask(task.id)} id="btn-delete" disabled={loading}>
-              <img src={deleteIcon} alt="delete--v1" width={20} height={24.5} />
-            </button>
-          )}
+          {!isDailyPage && <DeleteBtn deleteOnClick={() => deleteTask(task.id)} loading={loading} />}
         </div>
       ))}
+      {EmptyList(tasks.length === 0, 'No tasks for this day. Add one above!')}
     </div>
   );
 }

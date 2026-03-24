@@ -8,7 +8,7 @@ export default function WeightPage() {
 
   return (
     <div style={{ marginTop: '20px' }}>
-      <AddWeight weight={weights} setWeight={setWeights} />
+      <AddWeight weights={weights} setWeights={setWeights} />
       <WeightList weights={weights} setWeights={setWeights} />
       {EmptyList(weights.length === 0, 'No weight check.')}
     </div>

@@ -3,7 +3,7 @@ import './App.css';
 
 import HealthCheck from './pages/HealthCheckPage';
 import DailyTaskPage from './pages/DailyTaskPage';
-import BulkTaskPage from './pages/BulkTaskPage';
+import ManageTaskPage from './pages/ManageTaskPage';
 import HydratePage from './pages/HydratePage';
 import FloatingError from './components/FloatingError';
 import { ERRORS, PAGES } from './config/constants';
@@ -65,8 +65,12 @@ export default function App() {
           <nav>
             {page !== '' &&
               Object.keys(PAGES).map((hashPath) => {
-                if (['', page].includes(hashPath)) return null;
-                return <button onClick={() => navigate(hashPath)}>{PAGES[hashPath].title}</button>;
+                if (['', 'hydrate-routine', 'weight-routine'].includes(hashPath)) return null;
+                return (
+                  <button key={hashPath} onClick={() => navigate(hashPath)}>
+                    {PAGES[hashPath].title}
+                  </button>
+                );
               })}
           </nav>
         </div>
@@ -74,8 +78,8 @@ export default function App() {
           switch (path) {
             case 'daily-task':
               return <DailyTaskPage />;
-            case 'bulk-task':
-              return <BulkTaskPage />;
+            case 'manage':
+              return <ManageTaskPage />;
             case 'hydrate-routine':
               return <HydratePage />;
             case 'weight-routine':

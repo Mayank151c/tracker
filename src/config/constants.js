@@ -4,7 +4,8 @@ export const IS_PROD = process.env.REACT_APP_ENV === 'prod';
 export const DEBUG = process.env.REACT_APP_DEBUG;
 
 export const COLLECTIONS = {
-  TASKS: `env/${REACT_APP_ENV}/tasks`,
+  TASK_LIST: `env/${REACT_APP_ENV}/task-list`,
+  TASK_POOL: `env/${REACT_APP_ENV}/task-pool`,
   DAILY_SUMMARIES: `env/${REACT_APP_ENV}/daily-summaries`,
   ROUTINE: `env/${REACT_APP_ENV}/routine`,
 };
@@ -20,8 +21,8 @@ export const PAGES = {
   'daily-task': {
     title: 'Daily Task',
   },
-  'bulk-task': {
-    title: 'Bulk Task',
+  manage: {
+    title: 'Manage',
   },
   'hydrate-routine': {
     title: 'Hydrate Monitor',
