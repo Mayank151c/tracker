@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
 import { COLLECTIONS } from '../config/constants';
-import { getSubtractedDateString, getTodayDateString, getTodayDatetimeString, useConfig } from '../utils';
+import { getSubtractedDateString, getTodayDatetimeString, useConfig } from '../utils';
 import DeleteBtn from './elements/DeleteBtn';
 import TextUI from './elements/TextUI';
 import './TaskList.css';

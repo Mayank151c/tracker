@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import CryptoJS from 'crypto-js';
-import { IS_DEV, DEBUG } from './constants';
 
 function decryptConfig(secret) {
   const config = process.env.REACT_APP_FIREBASE_CONFIG;

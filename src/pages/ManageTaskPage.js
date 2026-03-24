@@ -70,7 +70,7 @@ export default function ManageTaskPageTask() {
     const taskListItem = createTaskListItem(taskId, date);
     const doc = await getRecordByField(db, COLLECTIONS.TASK_LIST, 'taskId', taskId, 'date', date);
     console.log('::', doc);
-    if (doc && doc.date == date) throw new Error(`Task already exists`);
+    if (doc && doc.date === date) throw new Error(`Task already exists`);
     return await setRecord(db, COLLECTIONS.TASK_LIST, taskListItem, taskListItem.id).then((id) => {
       taskListItem.id = id;
       taskListItem.text = taskpool.find((task) => task.id === taskId).text;
@@ -94,7 +94,7 @@ export default function ManageTaskPageTask() {
       let error = '',
         errorCount = 0,
         fulfilled = [];
-      results.map((result) => {
+      results.forEach((result) => {
         if (result.status === 'rejected') {
           errorCount++;
           error = `(${errorCount}) ${result.reason.message}`;

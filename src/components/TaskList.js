@@ -7,7 +7,7 @@ import TextUI from './elements/TextUI';
 import DeleteBtn from './elements/DeleteBtn';
 
 export default function TaskList({ tasks, setTasks, startDate, endDate, selectedTaskIds, setSelectedTaskIds, isDailyPage = false, isTaskPool = false }) {
-  const { db, setError, deleteIcon, checkDbConnection } = useConfig();
+  const { db, setError, checkDbConnection } = useConfig();
   const [loading, setLoading] = useState(false);
   const collectionName = isTaskPool ? COLLECTIONS.TASK_POOL : COLLECTIONS.TASK_LIST;
 
@@ -27,7 +27,6 @@ export default function TaskList({ tasks, setTasks, startDate, endDate, selected
       const list = [];
       snapshot.forEach((doc) => list.push({ id: doc.id, text: null, ...doc.data() }));
 
-      const tasksPopulatePromise = [];
       if (!isTaskPool) {
         for (const task of list) {
           if (task.text === null) {
@@ -44,7 +43,7 @@ export default function TaskList({ tasks, setTasks, startDate, endDate, selected
     } finally {
       setLoading(false);
     }
-  }, [db, setError, startDate, endDate, setTasks, checkDbConnection]);
+  }, [db, setError, startDate, endDate, setTasks, isTaskPool, collectionName, checkDbConnection]);
 
   const deleteTask = async (id) => {
     setLoading(true);
@@ -67,7 +66,7 @@ export default function TaskList({ tasks, setTasks, startDate, endDate, selected
   }, [loadTasks]);
 
   async function handleTaskCompletion(e, taskId) {
-    tasks.map((task) => {
+    tasks.forEach((task) => {
       if (taskId === task.id) {
         task.completed = e.target.checked;
         console.log(task);
