@@ -6,7 +6,7 @@ export const DEBUG = process.env.REACT_APP_DEBUG;
 export const COLLECTIONS = {
   TASK_LIST: `env/${REACT_APP_ENV}/task-list`,
   TASK_POOL: `env/${REACT_APP_ENV}/task-pool`,
-  DAILY_SUMMARIES: `env/${REACT_APP_ENV}/daily-summaries`,
+  DAILY_SUMMARIES: `env/${REACT_APP_ENV}/summaries`,
   ROUTINE: `env/${REACT_APP_ENV}/routine`,
 };
 

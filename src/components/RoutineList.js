@@ -72,7 +72,9 @@ function WeightRoutine() {
     }
   }, [db, setError, checkDbConnection]);
 
-  useEffect(() => getWeight, [getWeight]);
+  useEffect(() => {
+    getWeight();
+  }, [getWeight]);
 
   return (
     <RoutineItem path="weight-routine">
