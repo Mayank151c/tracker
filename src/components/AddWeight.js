@@ -8,10 +8,12 @@ function createWeightRecord(weight, weightDoc = null) {
   if (weightDoc) {
     weight += weightDoc.weight * weightDoc.count;
     weightDoc.count += 1;
-    return {
+    const record = {
       ...weightDoc,
       weight: parseWeight(weight / weightDoc.count),
     };
+    delete record.id;
+    return record;
   } else {
     return {
       date: getTodayDateString(),
@@ -39,7 +41,6 @@ export default function AddWeight({ weights, setWeights }) {
       const weightDoc = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', date, 'type', 'weight');
       const updatedRecordFields = createWeightRecord(weight, weightDoc);
       await setRecord(db, COLLECTIONS.ROUTINE, updatedRecordFields, weightDoc?.id).then((docId) => {
-        updatedRecordFields.id = docId;
         setWeights(weights.filter((weight) => weight.id !== docId).insert(0, updatedRecordFields));
       });
     } catch (err) {

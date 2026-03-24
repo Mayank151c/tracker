@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { COLLECTIONS } from '../config/constants';
-import { getRecord, getRecordByField, getTodayDateString, useConfig } from '../utils';
+import { getRecordByField, getTodayDateString, useConfig } from '../utils';
 import './RoutineList.css';
 import TextUI from './elements/TextUI';
 
@@ -30,7 +30,7 @@ function HydrateRoutine() {
   const getHydrate = useCallback(async () => {
     try {
       checkDbConnection();
-      const record = await getRecord(db, COLLECTIONS.ROUTINE, `hydrate-${getTodayDateString()}`);
+      const record = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', getTodayDateString(), 'type', 'hydrate');
       setHydrateLevel(record?.level ?? 0);
     } catch (err) {
       console.error('Error getting hydrate routine:', err);

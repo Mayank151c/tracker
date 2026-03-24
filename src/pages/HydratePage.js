@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getRecord, getTodayDateString, setRecord, useConfig } from '../utils';
+import { getRecordByField, getTodayDateString, setRecord, useConfig } from '../utils';
 import { COLLECTIONS } from '../config/constants';
 import './HydratePage.css';
 
@@ -7,6 +7,14 @@ const totalLevel = 12;
 const waterHeight = 388;
 const waterBlockHeight = 360 / totalLevel;
 const slope = 3;
+
+const createHydrateRoutine = (level, date) => {
+  return {
+    date: date,
+    type: 'hydrate',
+    level: level,
+  };
+};
 
 export default function HydratePage() {
   const [hydrateLevel, setHydrateLevel] = useState(0);
@@ -21,12 +29,9 @@ export default function HydratePage() {
       setEnable(false);
       try {
         const date = getTodayDateString();
-        const updateRecordFields = {
-          date: date,
-          type: 'hydrate',
-          level: level,
-        };
-        await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields, `hydrate-${date}`);
+        const updateRecordFields = createHydrateRoutine(level, date);
+        const record = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', date, 'type', 'hydrate');
+        await setRecord(db, COLLECTIONS.ROUTINE, updateRecordFields, record?.id);
         setHydrateLevel(level);
       } catch (err) {
         setError(err.message);
@@ -43,7 +48,7 @@ export default function HydratePage() {
       checkDbConnection();
       const date = getTodayDateString();
       // Get Hydrate details for today
-      const record = await getRecord(db, COLLECTIONS.ROUTINE, `hydrate-${date}`);
+      const record = await getRecordByField(db, COLLECTIONS.ROUTINE, 'date', date, 'type', 'hydrate');
       setHydrateLevel(record?.level ?? 0);
     } catch (err) {
       console.error('Error getting hydrate routine:', err);
